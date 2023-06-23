@@ -1,15 +1,16 @@
 library(haven)
+library(tidyverse)
+library(dyplr)
 
 EB10 <- read_sav("ZA5234_v2-0-1.sav")
 
 #### Datenbereinigung ####
 
-#v206 Zustimmung EU Mitglied 
 
-#v554 Bildungsjahre (D8)
-
-#v555 gender (D10)
-
-#v556 Alter (D11)
-
-test hallo 10:47Uhr
+df_1 <- select(EB10,
+               v6, #Land
+               v206, #Zustimmung EU
+               v554, #BJ
+               v555, #gender
+               v556 #Alter  
+               ) 
