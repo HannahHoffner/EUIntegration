@@ -48,7 +48,9 @@ clean_data <- na.omit(df_1)
 # 97 refusal 
 # 98 dk
 
-unique(df_01$)
+unique(df_1$BJ_recoded)
+
+
 
 #### Deskriptive Statistik ####
 
