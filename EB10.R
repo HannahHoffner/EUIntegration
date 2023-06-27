@@ -38,7 +38,16 @@ df_1 <- select(df_1,
 clean_data <- na.omit(df_1)
 
 
-#neue Variable: 
+##neue Variable: 
+
+#Geschlecht
+clean_data$Geschlecht <- NA
+
+clean_data$Geschlecht[clean_data$Gender == 1] <- 1 #male
+clean_data$Geschlecht[clean_data$Gender == 2] <- 0 #female
+
+
+
 #ZustimmungDichotom: good=1, bad&neither good nor bad=0, dk=löschen (??)
 ## Erstellung einer neuen Variable "EinstellungDichotom" mit NAs als Standardwert
 clean_data$EinstellungDichotom <- NA
@@ -60,7 +69,7 @@ clean_data$BJ_gruppiert <- clean_data$BJ_recoded
 # Löschen der Fälle mit den Antworten 97 und 98
 clean_data <- clean_data[!(clean_data$BJ_gruppiert %in% c(97, 98)), ]
 
-# Umkodierung der Antwortkategorie 11 zu 0
+# Umkodierung der Antwortkategorie 11 (no full time) zu 0
 clean_data$BJ_gruppiert[clean_data$BJ_gruppiert == 11] <- 0
 
 # Überprüfung der neuen Variable
@@ -81,29 +90,25 @@ cross_table2
 # Umwandeln der Kreuztabelle2 in einen Datenframe
 cross_table2_df <- as.data.frame(cross_table)
 
+
+#### Deskriptive Statistik ####
+
 # Plot der Verteilung
-ggplot(data = cross_table2_df, aes(x = Var2, y = Freq, fill = as.factor(Var1))) +
+ggplot(data = cross_table2_df, 
+       aes(x = Var2, 
+           y = Freq, 
+           fill = as.factor(Var1)
+           )
+       ) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "Bildungsjahre", y = "Prozentualer Anteil", fill = "EinstellungDichotom") +
+  labs(x = "Bildungsjahre",
+       y = "Prozentualer Anteil", 
+       fill = "EinstellungDichotom") +
   scale_fill_manual(values = c("1" = "blue", "0" = "red")) +
   theme_minimal()
 
 
 
 
-#Geschlecht auf 0 & 1
-
-#BJrecodiert: 10 still studying 
-# 11 no full time education 
-# 97 refusal 
-# 98 dk
-
-unique(df_1$BJ_recoded)
-
-
-
-#### Deskriptive Statistik ####
-
-plot(clean_data$BJ_recoded, clean_data$Zustimmung_EU)
 
 
