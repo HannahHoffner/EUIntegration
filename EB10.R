@@ -40,6 +40,18 @@ clean_data <- na.omit(df_1)
 
 #neue Variable: 
 #ZustimmungDichotom: good=1, bad&neither good nor bad=0, dk=löschen (??)
+# Erstellung einer neuen Variable "EinstellungDichotom" mit NAs als Standardwert
+clean_data$EinstellungDichotom <- NA
+
+# Umkodierung der Antwortkategorien und Zuordnung zu "EinstellungDichotom"
+clean_data$EinstellungDichotom[clean_data$Zustimmung_EU == 1] <- 1
+clean_data$EinstellungDichotom[clean_data$Zustimmung_EU %in% c(2, 3)] <- 0
+
+# Löschen der Fälle mit den Antworten 4 (dont know) und 9(inap)
+clean_data <- clean_data[!clean_data$Zustimmung_EU %in% c(4, 9), ]
+
+# Überprüfung der neuen Variable
+table(clean_data$EinstellungDichotom)
 
 #Geschlecht auf 0 & 1
 
