@@ -1,13 +1,43 @@
 library(haven)
+library(tidyverse)
+
+#### Datensatz einlesen ####
 
 EB10 <- read_sav("ZA5234_v2-0-1.sav")
 
 #### Datenbereinigung ####
 
-#v206 Zustimmung EU Mitglied 
+#Auswahl relevante Variablen 
 
-#v554 Bildungsjahre (D8)
+df_1 <- select(EB10,
+               v6, 
+               v40,
+               v206, 
+               v553,
+               v554,
+               v555,
+               v556   
+               ) 
 
-#v555 gender (D10)
+#Umbenennen der Variablen
 
-#v556 Alter (D11)
+df_1 <- select(df_1,
+               Land = v6, 
+               LandGewichtung = v40,
+               Zustimmung_EU = v206, 
+               BJ_recoded = v554,
+               Gender = v555,
+               Alter = v556
+               ) 
+
+#NAs löschen 
+
+clean_data <- na.omit(df_1)
+
+
+
+#### Deskreptive Statistik ####
+
+plot(clean_data$BJ_recoded, clean_data$Zustimmung_EU)
+
+
