@@ -38,8 +38,17 @@ df_1 <- select(df_1,
 clean_data <- na.omit(df_1)
 
 
-#neue Variable: ZustimmungDichotom: good=1, bad&neither good nor bad=0, dk=löschen (??)
+#neue Variable: 
+#ZustimmungDichotom: good=1, bad&neither good nor bad=0, dk=löschen (??)
 
+#Geschlecht auf 0 & 1
+
+#BJrecodiert: 10 still studying 
+# 11 no full time education 
+# 97 refusal 
+# 98 dk
+
+unique(df_01$)
 
 #### Deskriptive Statistik ####
 
