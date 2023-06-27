@@ -104,9 +104,6 @@ unique(df_1$BJ_recoded)
 
 #### Deskriptive Statistik ####
 
-
-#### Deskreptive Statistik ####
-
 plot(clean_data$BJ_recoded, clean_data$Zustimmung_EU)
 
 
