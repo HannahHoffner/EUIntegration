@@ -11,6 +11,7 @@ EB10 <- read_sav("ZA5234_v2-0-1.sav")
 
 df_1 <- select(EB10,
                v6, 
+               v40,
                v206, 
                v553,
                v554,
@@ -22,11 +23,21 @@ df_1 <- select(EB10,
 
 df_1 <- select(df_1,
                Land = v6, 
-               ZustimmungEU = v206, 
-               Bildungsjahre = v553,
-               BJrecoded = v554,
+               LandGewichtung = v40,
+               Zustimmung_EU = v206, 
+               BJ_recoded = v554,
                Gender = v555,
                Alter = v556
                ) 
 
-#hallo
+#NAs löschen 
+
+clean_data <- na.omit(df_1)
+
+
+
+#### Deskreptive Statistik ####
+
+plot(clean_data$BJ_recoded, clean_data$Zustimmung_EU)
+
+
