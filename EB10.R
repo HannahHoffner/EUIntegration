@@ -30,13 +30,15 @@ df_1 <- select(df_1,
                Alter = v556
                ) 
 
+#fehlt noch : BIP (BIP pro Kopf?)
 #NAs löschen 
 
 clean_data <- na.omit(df_1)
 
+#neue Variable: ZustimmungDichotom: good=1, bad&neither good nor bad=0, dk=löschen (??)
 
 
-#### Deskreptive Statistik ####
+#### Deskriptive Statistik ####
 
 plot(clean_data$BJ_recoded, clean_data$Zustimmung_EU)
 
