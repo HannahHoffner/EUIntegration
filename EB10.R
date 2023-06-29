@@ -1,9 +1,15 @@
 library(haven)
 library(tidyverse)
+library(readr)
+library(dplyr)
 
-#### Datensatz einlesen ####
+
+
+#### Datensatz Eurobarometer einlesen ####
 
 EB10 <- read_sav("ZA5234_v2-0-1.sav")
+
+
 
 #### Datenbereinigung ####
 
@@ -89,6 +95,31 @@ cross_table2
 
 # Umwandeln der Kreuztabelle2 in einen Datenframe
 cross_table2_df <- as.data.frame(cross_table)
+
+
+#### Datensatz GDP Inflationsbereinigt und Lebensunterhaltkosten ####
+
+
+gdp_per_capita_bereinigt <- read_csv("gdp-per-capita-inflation--and-ppp-adjusted-world-bank-data-vs-penn-world-table-data.csv")
+
+#2009 rausfiltern 
+
+gdp_per_capita_b1 <- filter(gdp_per_capita_bereinigt, Year == 2009)
+
+#Länder filtern
+
+eu_laender <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic",
+                "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+                "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
+                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
+
+gdp_per_capita_b2 <- subset(gdp_per_capita_b1,
+                            Entity %in% eu_laender)
+
+
+#### BIP ####
+BIP2010 <- read_csv("DP_LIVE_28062023180733877.csv")
+
 
 
 #### Deskriptive Statistik ####
