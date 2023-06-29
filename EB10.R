@@ -2,7 +2,11 @@ library(haven)
 library(tidyverse)
 library(readr)
 library(dplyr)
+library(ggplot2)
 
+#### To Do ####
+
+#Mitgliedsländer 2010 in EB und GDP kontrollieren
 
 
 #### Datensatz Eurobarometer einlesen ####
@@ -44,8 +48,6 @@ df_1 <- select(df_1,
 clean_data <- na.omit(df_1)
 
 
-##neue Variable: 
-
 #Geschlecht
 clean_data$Geschlecht <- NA
 
@@ -81,20 +83,9 @@ clean_data$BJ_gruppiert[clean_data$BJ_gruppiert == 11] <- 0
 # Überprüfung der neuen Variable
 table(clean_data$BJ_gruppiert)
 
-#UV: Bildung, AV: Einstellung
-## Laden des Pakets für Datenvisualisierung
-library(ggplot2)
+table(clean_data$Land)
 
-## Erstellung der Kreuztabelle mit Absolutwerten
-cross_table <- table(clean_data$EinstellungDichotom, clean_data$BJ_gruppiert)
-cross_table
-
-#Erstellung der Kreuztabelle2 mit Prozentwerten
-cross_table2 <- prop.table(table(clean_data$EinstellungDichotom, clean_data$BJ_gruppiert), margin = 2) * 100
-cross_table2
-
-# Umwandeln der Kreuztabelle2 in einen Datenframe
-cross_table2_df <- as.data.frame(cross_table)
+##Mitgliedsländer überprüfen
 
 
 #### Datensatz GDP Inflationsbereinigt und Lebensunterhaltkosten ####
@@ -108,21 +99,41 @@ gdp_per_capita_b1 <- filter(gdp_per_capita_bereinigt, Year == 2009)
 
 #Länder filtern
 
-eu_laender <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic",
+eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
                 "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
                 "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
-                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
+                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden",
+                "United Kingdom")
 
 gdp_per_capita_b2 <- subset(gdp_per_capita_b1,
                             Entity %in% eu_laender)
 
+#welches Land fehlt?
+
+#nur notwendige Spalten filtern
+
 
 #### BIP ####
+#! wenn, dann 2009!
 BIP2010 <- read_csv("DP_LIVE_28062023180733877.csv")
 
 
 
-#### Deskriptive Statistik ####
+#### Deskriptive Statistik #####
+
+#UV: Bildung, AV: Einstellung
+
+## Erstellung der Kreuztabelle mit Absolutwerten
+cross_table <- table(clean_data$EinstellungDichotom, clean_data$BJ_gruppiert)
+cross_table
+
+#Erstellung der Kreuztabelle2 mit Prozentwerten
+cross_table2 <- prop.table(table(clean_data$EinstellungDichotom, clean_data$BJ_gruppiert), margin = 2) * 100
+cross_table2
+
+# Umwandeln der Kreuztabelle2 in einen Datenframe
+cross_table2_df <- as.data.frame(cross_table)
+
 
 # Plot der Verteilung
 ggplot(data = cross_table2_df, 
