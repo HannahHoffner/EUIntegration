@@ -8,6 +8,8 @@ library(ggplot2)
 
 #Mitgliedsländer 2010 in EB und GDP kontrollieren
 
+#stargazer() hübschen Output
+
 
 #### Datensatz Eurobarometer einlesen ####
 
