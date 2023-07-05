@@ -10,6 +10,10 @@ library(ggplot2)
 
 #stargazer() hübschen Output
 
+## BIP 
+#! wenn, dann 2009!
+BIP2010 <- read_csv("DP_LIVE_28062023180733877.csv")
+
 
 #### Datensatz Eurobarometer einlesen ####
 
@@ -98,11 +102,38 @@ clean_data$Entity[clean_data$Land == 3] <- "Netherlands"
 clean_data$Entity[clean_data$Land == 4] <- "Germany West"
 clean_data$Entity[clean_data$Land == 5] <- "Italy"
 clean_data$Entity[clean_data$Land == 6] <- "Luxembourg"
+clean_data$Entity[clean_data$Land == 7] <- "France"
+clean_data$Entity[clean_data$Land == 8] <- "Ireland"
+clean_data$Entity[clean_data$Land == 9] <- "Great Britain"
+clean_data$Entity[clean_data$Land == 10] <- "Northern Ireland"
+clean_data$Entity[clean_data$Land == 11] <- "Greece"
+clean_data$Entity[clean_data$Land == 12] <- "Spain"
+clean_data$Entity[clean_data$Land == 13] <- "Portugal"
+clean_data$Entity[clean_data$Land == 14] <- "Germany East"
+#clean_data$Entity[clean_data$Land == 15] <- gibts nicht
+clean_data$Entity[clean_data$Land == 16] <- "Finnland"
+clean_data$Entity[clean_data$Land == 17] <- "Sweden"
+clean_data$Entity[clean_data$Land == 18] <- "Austria"
+clean_data$Entity[clean_data$Land == 19] <- "Cyprus"
+clean_data$Entity[clean_data$Land == 20] <- "Czech Republic"
+clean_data$Entity[clean_data$Land == 21] <- "Estonia"
+clean_data$Entity[clean_data$Land == 22] <- "Hungary"
+clean_data$Entity[clean_data$Land == 23] <- "Latvia"
+clean_data$Entity[clean_data$Land == 24] <- "Lithuania"
+clean_data$Entity[clean_data$Land == 25] <- "Malta"
+clean_data$Entity[clean_data$Land == 26] <- "Poland"
+clean_data$Entity[clean_data$Land == 27] <- "Slovakia"
+clean_data$Entity[clean_data$Land == 28] <- "Slovenia"
+clean_data$Entity[clean_data$Land == 29] <- "Bulgaria"
+clean_data$Entity[clean_data$Land == 30] <- "Romania"
+
 
 table(clean_data$Entity)
 
 
 ##wie Deutschland zu OD und WD 
+##Ireland vs. Northern Ireland, NI nicht im GDP Datensatz
+
 
 
 #### Datensatz GDP Inflationsbereinigt und Lebensunterhaltkosten ####
@@ -125,15 +156,40 @@ eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
 gdp_per_capita_b2 <- subset(gdp_per_capita_b1,
                             Entity %in% eu_laender)
 
-#welches Land fehlt?
+##OD und WD hinzufügen
 
-#nur notwendige Spalten filtern
+##Germany East
+# Zeile mit "Germany" finden
+zeileGER <- which(gdp_per_capita_b2$Entity == "Germany")
 
+# Zeile kopieren und umbenennen
+neue_zeile <- gdp_per_capita_b2[zeileGER, ]
+neue_zeile$Entity <- "Germany East"
 
-#### BIP ####
-#! wenn, dann 2009!
-BIP2010 <- read_csv("DP_LIVE_28062023180733877.csv")
+# Datensatz erweitern
+gdp_per_capita_b2 <- rbind(gdp_per_capita_b2, neue_zeile)
 
+## Germany West
+
+# Zeile kopieren und umbenennen
+neue_zeile <- gdp_per_capita_b2[zeileGER, ]
+neue_zeile$Entity <- "Germany West"
+
+# Datensatz erweitern
+gdp_per_capita_b2 <- rbind(gdp_per_capita_b2, neue_zeile)
+
+#Continent, Year, Population löschen
+
+gdp_per_capita_b2$Continent <- NULL
+gdp_per_capita_b2$Year <- NULL
+gdp_per_capita_b2$Code <- NULL
+
+colnames(gdp_per_capita_b2)[4] <- "Population"
+gdp_per_capita_b2$Population <- NULL
+
+#### Datensätze zusammenfügen ####
+
+df_final <- merge(clean_data, gdp_per_capita_b2, by = "Entity")
 
 
 #### Deskriptive Statistik #####
