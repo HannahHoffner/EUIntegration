@@ -87,7 +87,22 @@ table(clean_data$BJ_gruppiert)
 
 table(clean_data$Land)
 
-##Mitgliedsländer überprüfen
+#Ländernamen zum mergen 
+
+
+clean_data$Entity <- NA
+
+clean_data$Entity[clean_data$Land == 1] <- "France"
+clean_data$Entity[clean_data$Land == 2] <- "Belgium"
+clean_data$Entity[clean_data$Land == 3] <- "Netherlands"
+clean_data$Entity[clean_data$Land == 4] <- "Germany West"
+clean_data$Entity[clean_data$Land == 5] <- "Italy"
+clean_data$Entity[clean_data$Land == 6] <- "Luxembourg"
+
+table(clean_data$Entity)
+
+
+##wie Deutschland zu OD und WD 
 
 
 #### Datensatz GDP Inflationsbereinigt und Lebensunterhaltkosten ####
@@ -155,4 +170,14 @@ ggplot(data = cross_table2_df,
 
 
 
+#### Logistische Regression ####
 
+##Poppe VL
+
+fit_logit <- glm(formula = any_contact~(age+sex+eastwest),
+                 family = binomial(link = "logit"),
+                 data=df_allbus)
+
+fit_logit
+
+#Odds Ratio und individuelle marignale Effekte (IME) und AME
