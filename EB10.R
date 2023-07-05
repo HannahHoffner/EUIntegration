@@ -6,13 +6,12 @@ library(ggplot2)
 
 #### To Do ####
 
-#Mitgliedsländer 2010 in EB und GDP kontrollieren
 
-#stargazer() hübschen Output
+#stargazer() hübschen Output: 
+##bivariat: Bildung--> Einstellung, 
+##deskriptive??
+#Mehrebenenanalyse
 
-## BIP 
-#! wenn, dann 2009!
-BIP2010 <- read_csv("DP_LIVE_28062023180733877.csv")
 
 
 #### Datensatz Eurobarometer einlesen ####
