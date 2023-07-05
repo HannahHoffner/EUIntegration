@@ -248,3 +248,23 @@ model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country),
                family = binomial)
 
 
+##Nullmodell mit allen Kontrollvariablen, ohne UV (Lengfeld) H
+# Fit the null model
+null_model <- glmer(EinstellungDichotom ~ Geschlecht + Alter + LandGewichtung + GDPpcapita2009 + (1 | Entity), 
+                    data = df_final, 
+                    family = binomial(link = "logit"))
+
+# View the summary of the null model
+summary(null_model)
+
+
+##Logistische Mehrebenenanalyse H
+library(lme4)
+
+# Fit the logistic multilevel model
+fit <- glmer(EinstellungDichotom ~ BJ_gruppiert + Geschlecht + Alter + LandGewichtung + GDPpcapita2009 + (1 | Entity), 
+             data = df_final, 
+             family = binomial(link = "logit"))
+
+# View the summary of the model
+summary(fit)
