@@ -217,4 +217,34 @@ fit_logit <- glm(formula = any_contact~(age+sex+eastwest),
 
 fit_logit
 
-#Odds Ratio und individuelle marignale Effekte (IME) und AME
+#### Mehrebenen Logit ####
+install.packages(Matrix)
+library(lme4)
+
+##Nullmodell auf Länderebene (2. Ebene)
+
+
+model0 <- glmer(EinstellungDichotom ~ 1 + (1 | Entity), 
+                      data = df_final,
+                      family = binomial)
+
+summary(model0)
+
+#Varianz (Intercept): 24,46% Unterschiede d/ Länder, z-Wert = 0,606 :( 
+
+##Nullmodell auf Individualebene (1. Ebene)
+
+#BJ und Einstellung 
+model1 <- glmer(EinstellungDichotom ~ BJ_gruppiert + (1 | Entity),
+                data = df_final, 
+                family = binomial)
+
+
+summary(model1)
+
+#
+model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country), 
+               data = df_final,
+               family = binomial)
+
+
