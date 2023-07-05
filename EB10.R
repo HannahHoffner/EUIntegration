@@ -46,8 +46,6 @@ df_1 <- select(df_1,
                Alter = v556
                ) 
 
-#fehlt noch : BIP (BIP pro Kopf?)
-
 
 #NAs löschen 
 
@@ -99,7 +97,7 @@ clean_data$Entity <- NA
 clean_data$Entity[clean_data$Land == 1] <- "France"
 clean_data$Entity[clean_data$Land == 2] <- "Belgium"
 clean_data$Entity[clean_data$Land == 3] <- "Netherlands"
-clean_data$Entity[clean_data$Land == 4] <- "Germany West"
+clean_data$Entity[clean_data$Land == 4] <- "Germany" #West
 clean_data$Entity[clean_data$Land == 5] <- "Italy"
 clean_data$Entity[clean_data$Land == 6] <- "Luxembourg"
 clean_data$Entity[clean_data$Land == 7] <- "France"
@@ -109,7 +107,7 @@ clean_data$Entity[clean_data$Land == 10] <- "Northern Ireland"
 clean_data$Entity[clean_data$Land == 11] <- "Greece"
 clean_data$Entity[clean_data$Land == 12] <- "Spain"
 clean_data$Entity[clean_data$Land == 13] <- "Portugal"
-clean_data$Entity[clean_data$Land == 14] <- "Germany East"
+clean_data$Entity[clean_data$Land == 14] <- "Germany" #Ost
 #clean_data$Entity[clean_data$Land == 15] <- gibts nicht
 clean_data$Entity[clean_data$Land == 16] <- "Finnland"
 clean_data$Entity[clean_data$Land == 17] <- "Sweden"
@@ -150,35 +148,13 @@ gdp_per_capita_b1 <- filter(gdp_per_capita_bereinigt, Year == 2009)
 eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
                 "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
                 "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
-                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden",
-                "United Kingdom")
+                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
 
 gdp_per_capita_b2 <- subset(gdp_per_capita_b1,
                             Entity %in% eu_laender)
 
-##OD und WD hinzufügen
 
-##Germany East
-# Zeile mit "Germany" finden
-zeileGER <- which(gdp_per_capita_b2$Entity == "Germany")
-
-# Zeile kopieren und umbenennen
-neue_zeile <- gdp_per_capita_b2[zeileGER, ]
-neue_zeile$Entity <- "Germany East"
-
-# Datensatz erweitern
-gdp_per_capita_b2 <- rbind(gdp_per_capita_b2, neue_zeile)
-
-## Germany West
-
-# Zeile kopieren und umbenennen
-neue_zeile <- gdp_per_capita_b2[zeileGER, ]
-neue_zeile$Entity <- "Germany West"
-
-# Datensatz erweitern
-gdp_per_capita_b2 <- rbind(gdp_per_capita_b2, neue_zeile)
-
-#Continent, Year, Population löschen
+#Continent, Year, Population, Code löschen
 
 gdp_per_capita_b2$Continent <- NULL
 gdp_per_capita_b2$Year <- NULL
@@ -187,10 +163,16 @@ gdp_per_capita_b2$Code <- NULL
 colnames(gdp_per_capita_b2)[4] <- "Population"
 gdp_per_capita_b2$Population <- NULL
 
+
 #### Datensätze zusammenfügen ####
 
 df_final <- merge(clean_data, gdp_per_capita_b2, by = "Entity")
 
+colnames(df_final)[12] <- "egal"
+
+df_final$egal <- NULL
+
+colnames(df_final)[11] <- "GDPpcapita2009"
 
 #### Deskriptive Statistik #####
 
