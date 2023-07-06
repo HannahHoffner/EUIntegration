@@ -247,21 +247,6 @@ model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country),
                data = df_final,
                family = binomial)
 
-#ICC-Koeffizient berechnen, um Cluster-Effekt zu testen --> ob Mehrebenenanalyse geeignet ist
-install.packages("sjstats")
-library(sjstats)
-
-# Calculate the ICC
-icc <- icc(fit)
-
-# View the ICC
-icc
-
-# Calculate the ICC
-icc_rescaled <- icc(fit_rescaled)
-
-# View the ICC
-icc_rescaled
 
 ##Nullmodell mit allen Kontrollvariablen, ohne UV (Lengfeld) H
 # Fit the null model
@@ -312,3 +297,31 @@ fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht_sca
 
 # View the summary of the model with rescaled variables
 summary(fit_rescaled)
+
+
+#ICC-Koeffizient berechnen, um Cluster-Effekt zu testen --> ob Mehrebenenanalyse geeignet ist
+#install.packages("sjstats")
+#library(sjstats)
+library(performance)
+
+# Calculate the ICC
+icc <- icc(fit)
+
+# View the ICC
+icc
+
+# Calculate the ICC
+icc_rescaled <- icc(fit_rescaled)
+
+# View the ICC
+icc_rescaled
+
+# Calculate the ICC
+icc <- icc(fit_rescaled)
+
+# View the ICC
+icc
+
+#Adjusted ICC: 0.064
+#Unadjusted ICC: 0.059      --> schlecht! müsste >0.1 sein, um MEA geeignet zu sein
+
