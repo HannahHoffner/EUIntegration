@@ -247,6 +247,21 @@ model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country),
                data = df_final,
                family = binomial)
 
+#ICC-Koeffizient berechnen, um Cluster-Effekt zu testen --> ob Mehrebenenanalyse geeignet ist
+install.packages("sjstats")
+library(sjstats)
+
+# Calculate the ICC
+icc <- icc(fit)
+
+# View the ICC
+icc
+
+# Calculate the ICC
+icc_rescaled <- icc(fit_rescaled)
+
+# View the ICC
+icc_rescaled
 
 ##Nullmodell mit allen Kontrollvariablen, ohne UV (Lengfeld) H
 # Fit the null model
@@ -268,3 +283,32 @@ fit <- glmer(EinstellungDichotom ~ BJ_gruppiert + Geschlecht + Alter + LandGewic
 
 # View the summary of the model
 summary(fit)
+
+
+
+###Nach Warnung:
+#Warning messages:
+#1: Some predictor variables are on very different scales: consider rescaling 
+#2: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
+#Model failed to converge with max|grad| = 0.0590804 (tol = 0.002, component 1)
+#3: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
+#Model is nearly unidentifiable: very large eigenvalue
+#- Rescale variables?;Model is nearly unidentifiable: large eigenvalue ratio
+#- Rescale variables?
+
+
+
+# Rescale variables
+df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
+df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)
+df_final$Alter_scaled <- scale(df_final$Alter)
+df_final$LandGewichtung_scaled <- scale(df_final$LandGewichtung)
+df_final$GDPpcapita2009_scaled <- scale(df_final$GDPpcapita2009)
+
+# Fit the logistic multilevel model with rescaled variables
+fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht_scaled + Alter_scaled + LandGewichtung_scaled + GDPpcapita2009_scaled + (1 | Entity), 
+                      data = df_final, 
+                      family = binomial(link = "logit"))
+
+# View the summary of the model with rescaled variables
+summary(fit_rescaled)
