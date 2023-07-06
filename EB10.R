@@ -186,7 +186,7 @@ cross_table2 <- prop.table(table(clean_data$EinstellungDichotom, clean_data$BJ_g
 cross_table2
 
 # Umwandeln der Kreuztabelle2 in einen Datenframe
-cross_table2_df <- as.data.frame(cross_table)
+cross_table2_df <- as.data.frame(cross_table2)
 
 
 # Plot der Verteilung
@@ -197,15 +197,19 @@ ggplot(data = cross_table2_df,
            )
        ) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "Bildungsjahre",
-       y = "Prozentualer Anteil", 
+  labs(x = "Bildungsjahre kategorisiert",
+       y = "Anteil in %", 
        fill = "Einstellung zur EU") +
-  scale_fill_manual(values = c("1" = "darkblue", "0" = "lightblue")) +
-  theme_minimal()
+  scale_fill_manual(values = c("darkblue", "lightblue"), labels = c("Ablehnung", "Zustimmung")) +
+  theme_gray()
 
-
-
-
+# Create a stacked bar plot with modified legend labels and y-axis encoding
+ggplot(data = df_final, aes(x = as.factor(BJ_gruppiert), fill = as.factor(EinstellungDichotom))) +
+  geom_bar(position = "fill") +
+  labs(x = "Bildungsjahre kategorisiert", y = "Prozentualer Anteil", fill = "Einstellung zur EU") +
+  scale_fill_manual(values = c("darkblue", "lightblue"), labels = c("Ablehnung", "Zustimmung")) +
+  theme_gray() +
+  scale_y_continuous(labels = scales::percent_format())
 
 
 #### Logistische Regression ####
