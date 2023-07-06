@@ -287,7 +287,6 @@ summary(fit)
 #- Rescale variables?
 
 
-
 # Rescale variables
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
 df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)
@@ -326,7 +325,27 @@ icc <- icc(fit_rescaled)
 
 # View the ICC
 icc
-
+###Output
 #Adjusted ICC: 0.064
 #Unadjusted ICC: 0.059      --> schlecht! müsste >0.1 sein, um MEA geeignet zu sein
 
+
+###Output stargazer
+
+library(modelsummary)
+library(lmerTest)
+library(MLMusingR)
+data(engage) #in the MLMusingR package
+
+#Koeffizienten-Map erzeugen um Variablennamen umzulabeln für sauberen Output
+
+cm <- c('BJ_gruppiert_scaled'    = 'Bildungsjahre gruppiert',
+        'Geschlecht_scaled'    = 'Geschlecht',
+        'Alter_scaled' = 'Alter',
+        'LandGewichtung_scaled' = 'Land gewichtet',
+        'GDPpcapita2009_scaled' = 'GDP von 2009',
+        '(Intercept)' = 'Constant')
+
+#Modellzusammenfassung und speichern als docx
+modelsummary(fit_rescaled, coef_rename = cm, stars = TRUE, output = "tabelle.docx",
+             title = 'Multilevel Regression Model Ergebnisse Einstellungen zur EU.')
