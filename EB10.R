@@ -199,9 +199,10 @@ ggplot(data = cross_table2_df,
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Bildungsjahre",
        y = "Prozentualer Anteil", 
-       fill = "EinstellungDichotom") +
-  scale_fill_manual(values = c("1" = "blue", "0" = "red")) +
+       fill = "Einstellung zur EU") +
+  scale_fill_manual(values = c("1" = "darkblue", "0" = "lightblue")) +
   theme_minimal()
+
 
 
 
