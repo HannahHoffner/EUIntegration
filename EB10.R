@@ -6,6 +6,9 @@ library(ggplot2)
 
 #### To Do ####
 
+#Interpretation??
+
+
 
 #stargazer() hübschen Output: 
 ##bivariat: Bildung--> Einstellung, 
@@ -280,13 +283,13 @@ summary(fit)
 
 # Rescale variables
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
-df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)
+#df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
 df_final$Alter_scaled <- scale(df_final$Alter)
 df_final$LandGewichtung_scaled <- scale(df_final$LandGewichtung)
 df_final$GDPpcapita2009_scaled <- scale(df_final$GDPpcapita2009)
 
 # Fit the logistic multilevel model with rescaled variables
-fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht_scaled + Alter_scaled + LandGewichtung_scaled + GDPpcapita2009_scaled + (1 | Entity), 
+fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + Alter_scaled + LandGewichtung_scaled + GDPpcapita2009_scaled + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
 
