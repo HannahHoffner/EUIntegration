@@ -212,15 +212,6 @@ ggplot(data = df_final, aes(x = as.factor(BJ_gruppiert), fill = as.factor(Einste
   scale_y_continuous(labels = scales::percent_format())
 
 
-#### Logistische Regression ####
-
-##Poppe VL
-
-fit_logit <- glm(formula = any_contact~(age+sex+eastwest),
-                 family = binomial(link = "logit"),
-                 data=df_allbus)
-
-fit_logit
 
 #### Mehrebenen Logit ####
 install.packages(Matrix)
