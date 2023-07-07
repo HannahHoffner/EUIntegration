@@ -294,21 +294,21 @@ df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC", clus
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
 df_final$Alter_centered <- center(df_final$Alter, type="CWC", cluster=df_final$Entity)
 #df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
-df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC", cluster=df_final$Entity)
+#df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC", cluster=df_final$Entity)
 
 # Fit the logistic multilevel model with centered variables
-fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
+fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009 + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
 #gewichtet
-fit_centered_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
+fit_centered_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009 + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"),
                       weights = LandGewichtung)
 
 # View the summary of the model with centered variables
-summary(fit_centered)
-summary(fit_centered_weighted)
+summary(fit_centered)   #AIC 28747.4  BIC 28795.4
+summary(fit_centered_weighted) # AIC 24187.4  BIC 24235.4
 
 # Rescale variables
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
