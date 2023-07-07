@@ -249,7 +249,7 @@ model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country),
 
 ##Nullmodell mit allen Kontrollvariablen, ohne UV (Lengfeld) H
 # Fit the null model
-null_model <- glmer(EinstellungDichotom ~ Geschlecht + Alter + LandGewichtung + GDPpcapita2009 + (1 | Entity), 
+null_model <- glmer(EinstellungDichotom ~ Geschlecht + Alter + GDPpcapita2009 + (1 | Entity), 
                     data = df_final, 
                     family = binomial(link = "logit"))
 
@@ -261,7 +261,7 @@ summary(null_model)
 library(lme4)
 
 # Fit the logistic multilevel model
-fit <- glmer(EinstellungDichotom ~ BJ_gruppiert + Geschlecht + Alter + LandGewichtung + GDPpcapita2009 + (1 | Entity), 
+fit <- glmer(EinstellungDichotom ~ BJ_gruppiert + Geschlecht + Alter + GDPpcapita2009 + (1 | Entity), 
              data = df_final, 
              family = binomial(link = "logit"))
 
@@ -281,6 +281,22 @@ summary(fit)
 #- Rescale variables?
 
 
+# Center variables am Gruppenmittelwert
+library(misty)
+df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC")
+#df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
+df_final$Alter_centered <- center(df_final$Alter)
+df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
+df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC")
+
+# Fit the logistic multilevel model with rescaled variables
+fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
+                      data = df_final, 
+                      family = binomial(link = "logit"))
+
+# View the summary of the model with centered variables
+summary(fit_centered)
+
 # Rescale variables
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
@@ -295,7 +311,6 @@ fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + A
 
 # View the summary of the model with rescaled variables
 summary(fit_rescaled)
-
 
 #ICC-Koeffizient berechnen, um Cluster-Effekt zu testen --> ob Mehrebenenanalyse geeignet ist
 #install.packages("sjstats")
