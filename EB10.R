@@ -253,8 +253,15 @@ null_model <- glmer(EinstellungDichotom ~ Geschlecht + Alter + GDPpcapita2009 + 
                     data = df_final, 
                     family = binomial(link = "logit"))
 
+#gewichtetes NUllmodell
+null_model_weighted <- glmer(EinstellungDichotom ~ Geschlecht + Alter + GDPpcapita2009 + (1 | Entity), 
+                    data = df_final, 
+                    family = binomial(link = "logit"),
+                    weights = LandGewichtung)
+
 # View the summary of the null model
 summary(null_model)
+summary(null_model_weighted)
 
 
 ##Logistische Mehrebenenanalyse H
@@ -281,21 +288,27 @@ summary(fit)
 #- Rescale variables?
 
 
-# Center variables am Gruppenmittelwert
+# Center variables am Gruppenmittelwert FUNKTIONIERT NOCH NICHT: Error: Please specify the argument 'cluster' to apply centering within cluster (CWC).
 library(misty)
 df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC")
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
 df_final$Alter_centered <- center(df_final$Alter)
-df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
+#df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
 df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC")
 
 # Fit the logistic multilevel model with rescaled variables
 fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
+#gewichtet
+fit_centered_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
+                      data = df_final, 
+                      family = binomial(link = "logit"),
+                      weights = LandGewichtung)
 
 # View the summary of the model with centered variables
 summary(fit_centered)
+summary(fit_centered_weighted)
 
 # Rescale variables
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
