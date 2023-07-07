@@ -378,5 +378,3 @@ cm <- c('BJ_gruppiert_scaled'    = 'Bildungsjahre gruppiert',
 #Modellzusammenfassung und speichern als docx
 modelsummary(fit_rescaled, coef_rename = cm, stars = TRUE, output = "tabelle.docx",
              title = 'Multilevel Regression Model Ergebnisse Einstellungen zur EU.')
-
-#Test wenn ich hier arbeite, welcher Branch ändert sich?
