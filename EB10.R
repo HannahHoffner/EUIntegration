@@ -350,10 +350,10 @@ icc_rescaled <- icc(fit_rescaled)
 icc_rescaled
 
 # Calculate the ICC
-icc <- icc(fit_rescaled)
+icc_rescaled_weighted <- icc(fit_rescaled_weighted)
 
 # View the ICC
-icc
+icc_rescaled_weighted
 ###Output
 #Adjusted ICC: 0.064
 #Unadjusted ICC: 0.059      --> schlecht! müsste >0.1 sein, um MEA geeignet zu sein
