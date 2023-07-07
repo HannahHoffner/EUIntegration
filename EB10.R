@@ -288,13 +288,13 @@ summary(fit)
 #- Rescale variables?
 
 
-# Center variables am Gruppenmittelwert FUNKTIONIERT NOCH NICHT: Error: Please specify the argument 'cluster' to apply centering within cluster (CWC).
+# Center variables am Gruppenmittelwert FUNKTIONIERT NOCH NICHT.
 library(misty)
-df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC")
+df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC", cluster=df_final$Entity)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
-df_final$Alter_centered <- center(df_final$Alter)
+df_final$Alter_centered <- center(df_final$Alter, type="CWC", cluster=df_final$Entity)
 #df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
-df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC")
+df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC", cluster=df_final$Entity)
 
 # Fit the logistic multilevel model with centered variables
 fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
@@ -318,12 +318,19 @@ df_final$LandGewichtung_scaled <- scale(df_final$LandGewichtung)
 df_final$GDPpcapita2009_scaled <- scale(df_final$GDPpcapita2009)
 
 # Fit the logistic multilevel model with rescaled variables
-fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + Alter_scaled + LandGewichtung_scaled + GDPpcapita2009_scaled + (1 | Entity), 
+fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + Alter_scaled + GDPpcapita2009_scaled + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
 
+# Fit the logistic multilevel model with rescaled variables gewichtet
+fit_rescaled_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + Alter_scaled + GDPpcapita2009_scaled + (1 | Entity), 
+                      data = df_final, 
+                      family = binomial(link = "logit"),
+                      weights = LandGewichtung)
+
 # View the summary of the model with rescaled variables
-summary(fit_rescaled)
+summary(fit_rescaled)          #AIC 28746.4  BIC 28794.5
+summary(fit_rescaled_weighted) #AIC 24187.0  BIC 24235.0
 
 #ICC-Koeffizient berechnen, um Cluster-Effekt zu testen --> ob Mehrebenenanalyse geeignet ist
 #install.packages("sjstats")
