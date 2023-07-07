@@ -296,7 +296,7 @@ df_final$Alter_centered <- center(df_final$Alter)
 #df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
 df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC")
 
-# Fit the logistic multilevel model with rescaled variables
+# Fit the logistic multilevel model with centered variables
 fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009_centered + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
