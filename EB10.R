@@ -217,7 +217,7 @@ ggplot(data = df_final, aes(x = as.factor(BJ_gruppiert), fill = as.factor(Einste
 
 
 #### Mehrebenen Logit ####
-install.packages(Matrix)
+#install.packages(Matrix)
 library(lme4)
 
 ##Nullmodell auf Länderebene (2. Ebene)
