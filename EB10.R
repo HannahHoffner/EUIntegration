@@ -288,8 +288,12 @@ summary(fit)
 #- Rescale variables?
 
 
-# Center variables am Gruppenmittelwert FUNKTIONIERT NOCH NICHT.
+# Center variables am Gruppenmittelwert
+#install.packages("misty")
 library(misty)
+?center
+??center
+
 df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC", cluster=df_final$Entity)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
 df_final$Alter_centered <- center(df_final$Alter, type="CWC", cluster=df_final$Entity)
@@ -310,11 +314,12 @@ fit_centered_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Ges
 summary(fit_centered)   #AIC 28747.4  BIC 28795.4
 summary(fit_centered_weighted) # AIC 24187.4  BIC 24235.4
 
-# Rescale variables
+# Rescale variables - z-Transformation
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
 df_final$Alter_scaled <- scale(df_final$Alter)
-df_final$LandGewichtung_scaled <- scale(df_final$LandGewichtung)
+df_final$Alter_scaled2 <- scale(df_final$Alter)
+#df_final$LandGewichtung_scaled <- scale(df_final$LandGewichtung)
 df_final$GDPpcapita2009_scaled <- scale(df_final$GDPpcapita2009)
 
 # Fit the logistic multilevel model with rescaled variables
