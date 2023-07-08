@@ -268,8 +268,6 @@ summary(fit)
 # Center variables am Gruppenmittelwert
 #install.packages("misty")
 library(misty)
-?center
-??center
 
 df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC", cluster=df_final$Entity)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
