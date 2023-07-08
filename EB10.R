@@ -34,7 +34,8 @@ df_1 <- select(EB10,
                v553,
                v554,
                v555,
-               v556   
+               v556,
+               v557
                ) 
 
 #Umbenennen der Variablen
@@ -45,7 +46,8 @@ df_1 <- select(df_1,
                Zustimmung_EU = v206, 
                BJ_recoded = v554,
                Gender = v555,
-               Alter = v556
+               Alter = v556,
+               AlterGruppiert = v557
                ) 
 
 
@@ -249,12 +251,12 @@ model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country),
 
 ##Nullmodell mit allen Kontrollvariablen, ohne UV (Lengfeld) H
 # Fit the null model
-null_model <- glmer(EinstellungDichotom ~ Geschlecht + Alter + GDPpcapita2009 + (1 | Entity), 
+null_model <- glmer(EinstellungDichotom ~ Geschlecht + AlterGruppiert + GDPpcapita2009 + (1 | Entity), 
                     data = df_final, 
                     family = binomial(link = "logit"))
 
 #gewichtetes NUllmodell
-null_model_weighted <- glmer(EinstellungDichotom ~ Geschlecht + Alter + GDPpcapita2009 + (1 | Entity), 
+null_model_weighted <- glmer(EinstellungDichotom ~ Geschlecht + AlterGruppiert + GDPpcapita2009 + (1 | Entity), 
                     data = df_final, 
                     family = binomial(link = "logit"),
                     weights = LandGewichtung)
@@ -268,7 +270,7 @@ summary(null_model_weighted)
 library(lme4)
 
 # Fit the logistic multilevel model
-fit <- glmer(EinstellungDichotom ~ BJ_gruppiert + Geschlecht + Alter + GDPpcapita2009 + (1 | Entity), 
+fit <- glmer(EinstellungDichotom ~ BJ_gruppiert + Geschlecht + AlterGruppiert + GDPpcapita2009 + (1 | Entity), 
              data = df_final, 
              family = binomial(link = "logit"))
 
@@ -296,16 +298,17 @@ library(misty)
 
 df_final$BJ_gruppiert_centered <- center(df_final$BJ_gruppiert, type="CWC", cluster=df_final$Entity)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
+df_final$AlterGruppiert_centered <- center(df_final$AlterGruppiert, type="CWC", cluster=df_final$Entity)
 df_final$Alter_centered <- center(df_final$Alter, type="CWC", cluster=df_final$Entity)
 #df_final$LandGewichtung_centered <- center(df_final$LandGewichtung, type="CWC")
 #df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC", cluster=df_final$Entity)
 
 # Fit the logistic multilevel model with centered variables
-fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009 + (1 | Entity), 
+fit_centered <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + AlterGruppiert_centered + GDPpcapita2009 + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
 #gewichtet
-fit_centered_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + Alter_centered + GDPpcapita2009 + (1 | Entity), 
+fit_centered_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Geschlecht + AlterGruppiert_centered + GDPpcapita2009 + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"),
                       weights = LandGewichtung)
@@ -318,17 +321,17 @@ summary(fit_centered_weighted) # AIC 24187.4  BIC 24235.4
 df_final$BJ_gruppiert_scaled <- scale(df_final$BJ_gruppiert)
 #df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)  Geschlecht nicht zentrieren weil eh dichotom!
 df_final$Alter_scaled <- scale(df_final$Alter)
-df_final$Alter_scaled2 <- scale(df_final$Alter)
+df_final$AlterGruppiert_scaled <- scale(df_final$AlterGruppiert)
 #df_final$LandGewichtung_scaled <- scale(df_final$LandGewichtung)
 df_final$GDPpcapita2009_scaled <- scale(df_final$GDPpcapita2009)
 
 # Fit the logistic multilevel model with rescaled variables
-fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + Alter_scaled + GDPpcapita2009_scaled + (1 | Entity), 
+fit_rescaled <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + AlterGruppiert_scaled + GDPpcapita2009_scaled + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"))
 
 # Fit the logistic multilevel model with rescaled variables gewichtet
-fit_rescaled_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + Alter_scaled + GDPpcapita2009_scaled + (1 | Entity), 
+fit_rescaled_weighted <- glmer(EinstellungDichotom ~ BJ_gruppiert_scaled + Geschlecht + AlterGruppiert_scaled + GDPpcapita2009_scaled + (1 | Entity), 
                       data = df_final, 
                       family = binomial(link = "logit"),
                       weights = LandGewichtung)
