@@ -222,31 +222,6 @@ ggplot(data = df_final, aes(x = as.factor(BJ_gruppiert), fill = as.factor(Einste
 #install.packages(Matrix)
 library(lme4)
 
-##Nullmodell auf Länderebene (2. Ebene)
-
-
-model0 <- glmer(EinstellungDichotom ~ 1 + (1 | Entity), 
-                      data = df_final,
-                      family = binomial)
-
-summary(model0)
-
-#Varianz (Intercept): 24,46% Unterschiede d/ Länder, z-Wert = 0,606 :( 
-
-##Nullmodell auf Individualebene (1. Ebene)
-
-#BJ und Einstellung 
-model1 <- glmer(EinstellungDichotom ~ BJ_gruppiert + (1 | Entity),
-                data = df_final, 
-                family = binomial)
-
-
-summary(model1)
-
-#
-model <- glmer(Y ~ X + GDP + Bildungsjahre + (1 | Country), 
-               data = df_final,
-               family = binomial)
 
 
 ##Nullmodell mit allen Kontrollvariablen, ohne UV (Lengfeld) H
