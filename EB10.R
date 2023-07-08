@@ -172,11 +172,11 @@ gdp_per_capita_b2$Population <- NULL
 
 df_final <- merge(clean_data, gdp_per_capita_b2, by = "Entity")
 
-colnames(df_final)[12] <- "egal"
+colnames(df_final)[13] <- "egal"
 
 df_final$egal <- NULL
 
-colnames(df_final)[11] <- "GDPpcapita2009"
+colnames(df_final)[12] <- "GDPpcapita2009"
 
 #### Deskriptive Statistik #####
 
