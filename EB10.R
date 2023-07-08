@@ -379,7 +379,6 @@ data(engage) #in the MLMusingR package
 cm <- c('BJ_gruppiert_scaled'    = 'Bildungsjahre gruppiert',
         'Geschlecht_scaled'    = 'Geschlecht',
         'Alter_scaled' = 'Alter',
-        'LandGewichtung_scaled' = 'Land gewichtet',
         'GDPpcapita2009_scaled' = 'GDP von 2009',
         '(Intercept)' = 'Constant')
 
