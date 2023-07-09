@@ -5,11 +5,13 @@ library(haven)
 library(tidyverse)
 library(readr)
 library(dplyr)
-library(ggplot2)   #Diagramme
-library(lme4)      #Mehrebenenanlyse
-library(misty)     #Zentrierung
-library(stargazer) #Output
+library(ggplot2)    #Diagramme
+library(lme4)       #Mehrebenenanlyse
+library(misty)      #Zentrierung
+library(stargazer)  #Output
 library(performance)#ICC
+library(dplyr)      #BIP quadrieren
+
 
 #Daten einlesen
 EB_10 <- read_sav("ZA5234_v2-0-1.sav") #Eurobarometer
@@ -105,7 +107,11 @@ DatensatzGesamt <- merge(DatensatzEB, GDP2, by = "Entity")                   #Da
 DatensatzGesamt$Bildungsjahre <- NULL                                        # Bildungsjahre Alter
 DatensatzGesamt$Geschlecht <- NULL                                           #Geschlecht alte Kodierung
 DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL #GDP unnötig
-colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"                            #Umbenennung Spalte
+colnames(DatensatzGesamt)[11] <- "GDPpcapita2009" #Umbenennung Spalte
+
+# Neue quadrierte BIPVariable hinzufügen
+DatensatzGesamt <- DatensatzGesamt %>% 
+  mutate(bip_squared = GDPpcapita2009^2)  ##quadriertes BIP nicht signifikant, daher mit normalem weitergerechnet!
 
 ###Mehrebenenanalyse
 
@@ -129,7 +135,6 @@ DatensatzGesamt$BJ_gruppiert_centeredGrandMean <- center(DatensatzGesamt$Bildung
 #Step 1: Leermodell
 #Below are the commands to run an empty model, that is, a model containing no predictors, 
 # and calculate the intraclass correlation coefficient (ICC; the degree of homogeneity of the outcome within clusters).
-
 
 M0 <- glmer(EinstellungDichotom ~ ( 1 | Entity),
             data=DatensatzGesamt,
@@ -157,18 +162,33 @@ CIM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppi
              family = "binomial",
              weights = Gewichtung_Land)
 summary(CIM)
-#paste("FYI: The deviance of the CIM is:", CIM@devcomp$cmp[[8]])
+
+#mit gruppeninterner Zentrierung
+CIM_cmc <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 | Entity),
+             data = DatensatzGesamt,
+             family = "binomial",
+             weights = Gewichtung_Land)
+summary(CIM_cmc)
 
 # augmented intermediate model (AIM); inkl random slope term von Bildung
+#To estimate a random slope effect in lme4, you place the predictor for which you want a random slope before the |
 AIM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 + BJ_gruppiert_centeredGrandMean || Entity),
              data = DatensatzGesamt,
              family = "binomial",
              weights = Gewichtung_Land)
 summary(AIM)
 
+#mit gruppeninterner Zentrierung
+AIM_cmc <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 + BJ_gruppiert_centered || Entity),
+             data = DatensatzGesamt,
+             family = "binomial",
+             weights = Gewichtung_Land)
+summary(AIM_cmc)
+
 #Testen ob Miteinbeziehung von random slope der Bildung das Modell verbessert 
 #likelihood-ratio test LR X(1)²,  Vergleich der deviance bei CIM und AIM
 anova(CIM, AIM)
+anova(CIM_cmc, AIM_cmc)
 
 #final model (inklusive cross-level interaction) 
 FM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 +  (1 + BJ_gruppiert_centeredGrandMean || Entity) + BJ_gruppiert_centeredGrandMean:GDPpcapita2009,
@@ -177,24 +197,33 @@ FM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppie
             weights = Gewichtung_Land)
 summary(FM)
 
+## Vergleich von Mehrebenen (glmer) zu nicht (glm)
+GLM <-  glm(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + BJ_gruppiert_centered:GDPpcapita2009, data = DatensatzGesamt, family = "binomial")
+summary (GLM)
+
+#Calculate Odds-Ratios
+#OR <- exp(fixef(AIM_cmc))
+#CI <- exp(confint(AIM_cmc,parm="beta_"))
 #################################################
 #data(DatensatzGesamt) 
 s1 <- glmer(EinstellungDichotom ~ Geschlecht_recoded + Alter_gruppiert + GDPpcapita2009 + (1|Entity), family = binomial,
             data = DatensatzGesamt)
-s2 <- update(s1, . ~ . + Bildungsjahre_recoded)
+s2 <- update(s1, . ~ . + BJ_gruppiert_centered)
 
 
 ###Output:
-cm <- c('Bildungsjahre_recoded'    = 'Bildungsjahre gruppiert',
+cm <- c('BJ_gruppiert_centered'    = 'Bildungsjahre gruppiert',
         'Geschlecht_recoded'    = 'Geschlecht',
         'Alter_gruppiert' = 'Alter',
         'GDPpcapita2009' = 'GDP von 2009',
-        '(Intercept)' = 'Constant')
-modelsummary(list(s1, s2),
+        '(Intercept)' = 'Constant',
+        'SD (BJ_gruppiert_centered Entity)' = 'SD Bildungsjahre gruppiert, Land'
+        )
+modelsummary(list(s1, s2, CIM_cmc, AIM_cmc),
              coef_rename = cm,
              statistic = "({conf.low}, {conf.high})",
              exponentiate = TRUE, stars = TRUE,
              coef_omit = "Intercept",
-             title = 'Multilevel Logistic Regression Model Results
-Predicting Suspensions Using Odds Ratios (ORs)'
-)
+             title = 'Multilevel Logistic Regression Model Results Predicting Suspensions Using Odds Ratios (ORs)',
+             dep.var.labels = c("Einstellung gegenüber der EU")
+             )
