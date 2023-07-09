@@ -227,3 +227,6 @@ modelsummary(list(s1, s2, CIM_cmc, AIM_cmc),
              title = 'Multilevel Logistic Regression Model Results Predicting Suspensions Using Odds Ratios (ORs)',
              dep.var.labels = c("Einstellung gegenüber der EU")
              )
+
+
+modelsummary(M0)
