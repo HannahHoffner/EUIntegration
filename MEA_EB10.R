@@ -9,6 +9,7 @@ library(ggplot2)   #Diagramme
 library(lme4)      #Mehrebenenanlyse
 library(misty)     #Zentrierung
 library(stargazer) #Output
+library(performance)#ICC
 
 #Daten einlesen
 EB_10 <- read_sav("ZA5234_v2-0-1.sav") #Eurobarometer
@@ -107,6 +108,76 @@ DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL #GD
 colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"                            #Umbenennung Spalte
 
 ###Mehrebenenanalyse
+
+#Preliminary phase: Preparing the data (centering variables)
+#Step #1: Building an empty model, so as to assess the variation of the log-odds from one cluster to another
+#Step #2: Building an intermediate model, so as to assess the variation of the lower-level effect(s) from one cluster to another
+#Step #3: Building a final model, so as to test the hypothesis(/-es)
+
+#Preliminary phase
+###Daten zentrieren:
+# Center variables am Gruppenmittelwert
+DatensatzGesamt$BJ_gruppiert_centered <- center(DatensatzGesamt$Bildungsjahre_recoded, type="CWC", cluster=df_final$Entity)
+#am Gesamtmittelwert:
+DatensatzGesamt$BJ_gruppiert_centeredGrandMean <- center(DatensatzGesamt$Bildungsjahre_recoded, type = "CGM")
+#df_final$Geschlecht_scaled <- scale(df_final$Geschlecht)                                                                ## Geschlecht nicht zentrieren weil eh dichotom!
+#DatensatzGesamt$AlterGruppiert_centered <- center(DatensatzGesamt$Alter_gruppiert, type="CWC", cluster=df_final$Entity) ## Zentrierung sinvoll????
+#DatensatzGesamt$Alter_centered <- center(DatensatzGesamt$Alter, type="CWC", cluster=df_final$Entity)                    ## wir arbeiten mit Alter gruppiert
+#df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC", cluster=df_final$Entity)                ## unnötig da schon zentriert
+
+
+#Step 1: Leermodell
+#Below are the commands to run an empty model, that is, a model containing no predictors, 
+# and calculate the intraclass correlation coefficient (ICC; the degree of homogeneity of the outcome within clusters).
+
+
+M0 <- glmer(EinstellungDichotom ~ ( 1 | Entity),
+            data=DatensatzGesamt,
+            family = "binomial",
+            weights = Gewichtung_Land)
+summary(M0)
+
+icc <- M0@theta[1]^2/ (M0@theta[1]^2 + (3.14159^2/3))
+icc #Ergebnis: 0.0692001
+# bei gewichteten Ländern: 0.0409
+
+icc_mit_Paket <-icc(M0)
+icc_mit_Paket #Ergebnis ist gleich: Adjusted ICC: 0.069, Unadjusted ICC: 0.069, gewichtete Länder: 0.041
+
+
+#If you focus on the between-observation effect of the (level-1) variable, you can use the grand-mean centered variable ("gpa_gmc"). 
+#If you focus on the within-cluster effect, use the cluster-mean centered variable ("gpa_cmc"). 
+#We use the cluster-mean centered variable herein.
+
+# Below are the commands to run the constrained intermediate model (CIM); 
+# the model contains all level-1 variables, all level-2 variables well as all intra-level interactions).
+
+CIM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 | Entity),
+             data = DatensatzGesamt,
+             family = "binomial",
+             weights = Gewichtung_Land)
+summary(CIM)
+#paste("FYI: The deviance of the CIM is:", CIM@devcomp$cmp[[8]])
+
+# augmented intermediate model (AIM); inkl random slope term von Bildung
+AIM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 + BJ_gruppiert_centeredGrandMean || Entity),
+             data = DatensatzGesamt,
+             family = "binomial",
+             weights = Gewichtung_Land)
+summary(AIM)
+
+#Testen ob Miteinbeziehung von random slope der Bildung das Modell verbessert 
+#likelihood-ratio test LR X(1)²,  Vergleich der deviance bei CIM und AIM
+anova(CIM, AIM)
+
+#final model (inklusive cross-level interaction) 
+FM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 +  (1 + BJ_gruppiert_centeredGrandMean || Entity) + BJ_gruppiert_centeredGrandMean:GDPpcapita2009,
+            data = DatensatzGesamt,
+            family = "binomial",
+            weights = Gewichtung_Land)
+summary(FM)
+
+#################################################
 #data(DatensatzGesamt) 
 s1 <- glmer(EinstellungDichotom ~ Geschlecht_recoded + Alter_gruppiert + GDPpcapita2009 + (1|Entity), family = binomial,
             data = DatensatzGesamt)
