@@ -10,11 +10,9 @@ library(lme4)      #Mehrebenenanlyse
 library(misty)     #Zentrierung
 library(stargazer) #Output
 
-
 #Daten einlesen
 EB_10 <- read_sav("ZA5234_v2-0-1.sav") #Eurobarometer
 gdp <- read_csv("gdp-per-capita-inflation--and-ppp-adjusted-world-bank-data-vs-penn-world-table-data.csv") #GDP
-
 
 #Datensätze reinigen
 ##EB10
@@ -38,7 +36,6 @@ DatensatzEB$Geschlecht_recoded <- NA
 DatensatzEB$Geschlecht_recoded [DatensatzEB$Geschlecht == 1] <- 1 #male
 DatensatzEB$Geschlecht_recoded [DatensatzEB$Geschlecht == 2] <- 0 #female
 
-
 #Einstellung zur EU recoden (dichotomisieren: good=1, bad&neither good nor bad=0, dk=löschen
 DatensatzEB$EinstellungDichotom <- NA
 
@@ -47,7 +44,6 @@ DatensatzEB$EinstellungDichotom[DatensatzEB$Einstellung_EU == 1] <- 1          #
 DatensatzEB$EinstellungDichotom[DatensatzEB$Einstellung_EU %in% c(2, 3)] <- 0  #schlecht, weder noch
 DatensatzEB <- DatensatzEB[!DatensatzEB$Einstellung_EU %in% c(4, 9), ]         # Löschen der Fälle mit den Antworten 4 (dont know) und 9(inap)
 
-
 #Bildung gruppiert neu kodiert:
 DatensatzEB$Bildungsjahre_recoded <- DatensatzEB$Bildungsjahre_kategorisiert     # Umkodierung der Antwortkategorien
 DatensatzEB <- DatensatzEB[!(DatensatzEB$Bildungsjahre_recoded %in% c(97, 98)), ]# Löschen der Fälle mit den Antworten 97 und 98
@@ -55,7 +51,6 @@ DatensatzEB$Bildungsjahre_recoded[DatensatzEB$Bildungsjahre_recoded == 11] <- 0 
 
 ###Ländernamen zum mergen
 DatensatzEB$Entity <- NA
-
 DatensatzEB$Entity[DatensatzEB$Land == 1] <- "France"
 DatensatzEB$Entity[DatensatzEB$Land == 2] <- "Belgium"
 DatensatzEB$Entity[DatensatzEB$Land == 3] <- "Netherlands"
@@ -87,10 +82,6 @@ DatensatzEB$Entity[DatensatzEB$Land == 28] <- "Slovenia"
 DatensatzEB$Entity[DatensatzEB$Land == 29] <- "Bulgaria"
 DatensatzEB$Entity[DatensatzEB$Land == 30] <- "Romania"
 
-
-table(DatensatzEB$Entity)
-
-
 ##GDP Datensatz
 GDP <- filter(gdp, Year == 2009)  #2009 rausfiltern 
 #Länder filtern
@@ -105,17 +96,34 @@ GDP2 <- subset(GDP, Entity %in% eu_laender)
 GDP2$Continent <- NULL
 GDP2$Year <- NULL
 GDP2$Code <- NULL
-
 colnames(GDP2)[4] <- "Population"
 GDP2$Population <- NULL
 
-#### Datensätze zusammenfügen ####
+#Finalen Datensatz erstellen
+DatensatzGesamt <- merge(DatensatzEB, GDP2, by = "Entity")                   #Datensätze zusammenfügen
+DatensatzGesamt$Bildungsjahre <- NULL                                        # Bildungsjahre Alter
+DatensatzGesamt$Geschlecht <- NULL                                           #Geschlecht alte Kodierung
+DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL #GDP unnötig
+colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"                            #Umbenennung Spalte
 
-DatensatzGesamt <- merge(DatensatzEB, GDP2, by = "Entity")
+###Mehrebenenanalyse
+#data(DatensatzGesamt) 
+s1 <- glmer(EinstellungDichotom ~ Geschlecht_recoded + Alter_gruppiert + GDPpcapita2009 + (1|Entity), family = binomial,
+            data = DatensatzGesamt)
+s2 <- update(s1, . ~ . + Bildungsjahre_recoded)
 
-DatensatzGesamt$Bildungsjahre <- NULL # Bildungsjahre Alter
-DatensatzGesamt$Geschlecht <- NULL #Geschlecht alte Kodierung
-DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL#GDP unnötig
-colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"
 
-
+###Output:
+cm <- c('Bildungsjahre_recoded'    = 'Bildungsjahre gruppiert',
+        'Geschlecht_recoded'    = 'Geschlecht',
+        'Alter_gruppiert' = 'Alter',
+        'GDPpcapita2009' = 'GDP von 2009',
+        '(Intercept)' = 'Constant')
+modelsummary(list(s1, s2),
+             coef_rename = cm,
+             statistic = "({conf.low}, {conf.high})",
+             exponentiate = TRUE, stars = TRUE,
+             coef_omit = "Intercept",
+             title = 'Multilevel Logistic Regression Model Results
+Predicting Suspensions Using Odds Ratios (ORs)'
+)
