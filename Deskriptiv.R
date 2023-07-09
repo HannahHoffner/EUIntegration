@@ -4,6 +4,7 @@ library(readr)
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
+library(ggrepel)
 
 #### Deskriptive Statistik ####
 
@@ -55,7 +56,7 @@ legend("topleft",
 
 
 
-#### Zustimmung Abhängigkeit kategorisiertem Alter ####
+#### Alter kategorisiert und Zustimmung ####
 
 ## Erstellung der Kreuztabelle mit Absolutwerten
 cross_tableAlter <- table(df_final$EinstellungDichotom, df_final$AlterGruppiert)
@@ -106,7 +107,7 @@ plot_alter <- grid.arrange(plotA, text_plot, ncol = 2, widths = c(0.7, 0.25))
 
 #Zustimmung sinkt mit Alter
 
-####Zustimmung in Abhängigkeit zur Bildung (kategorisiert) ####
+#### Bildung (kategorisiert) und Zustimmung ####
 
 #UV: Bildung, AV: Einstellung
 
@@ -121,7 +122,7 @@ cross_table2
 # Umwandeln der Kreuztabelle2 in einen Datenframe
 cross_table2_df <- as.data.frame(cross_table2)
 
-
+library(ggplot2)
 # Plot der Verteilung
 ggplot(data = cross_table2_df, 
        aes(x = Var2, 
@@ -159,7 +160,8 @@ plotB <- ggplot(data = df_final,
   ggtitle("Einstellung zur EU (in Prozent) nach kategorisierten Bildungsjahren")
 
 
-k1 <- c("1: bis zu 14 Bildungsjahren",
+k1 <- c( "0: keine Vollzeitbildung",
+         "1: bis zu 14 Bildungsjahren",
                      "2: 15 Bildungsjahre",
                      "3: 16 Bildungsjahre",
                      "4: 17 Bildungsjahre",
@@ -168,7 +170,8 @@ k1 <- c("1: bis zu 14 Bildungsjahren",
                      "7: 20 Bildungsjahre",
                      "8: 21 Bildungsjahre",
                      "9: 22 Bildungsjahre und mehr",
-                     "10: still studying")
+                     "10: noch im Bildungssystem")
+
 
 text_plot2 <- tableGrob(data.frame(category = k1), rows = NULL)
 
@@ -178,7 +181,7 @@ plot_BJ <- grid.arrange(plotB, text_plot2, ncol = 2, widths = c(0.6, 0.25))
 
 #Zustimmung steigt mit zunehmenden BJ
 
-#### Zustimmung in Abhängigkeit zum Geschlecht ####
+#### Geschlecht und Zustimmung  ####
 
 #0 female 
 #1 male 
@@ -226,20 +229,64 @@ plotC
 
 library(gridExtra)
 
-plot_geschlecht <- grid.arrange(plotC, k2, ncol = 2, widths = c(0.7, 0.25))
+plot_geschlecht <- grid.arrange(plotC, k2, ncol = 2, widths = c(1, 0.25))
 
 #Männer stimmen eher zu
 
-#### Deskriptive Output ####
+#### GDP und Land ####
 
-library(stargazer)
-stargazer(df_final,
-          title = "Deskriptive Statistik und Kodierung der modellspezifischen Variablen")
+GDPLand <- unique(df_final[, c("Entity", "GDPpcapita2009")])
 
-#### Deskreptiver Output ####
+GDPLand
 
-install.packages("psych")
-library(psych)
- 
+#### GDP und Zustimmung ####
 
-describe(df_final$EinstellungDichotom, df_final$Geschlecht)
+#install.packages("ggrepel")
+
+
+library(tidyverse)
+
+df_gdp <- df_final
+
+
+# Mittelwert der EinstellungDichotom für jedes Land berechnen
+mittelwerte <- aggregate(EinstellungDichotom ~ Entity, 
+                         data = df_gdp, 
+                         FUN = mean)
+
+# Neue Variable mit den Mittelwerten hinzufügen
+df_gdp <- merge(df_gdp, mittelwerte, by = "Entity", all.x = TRUE)
+
+# Umbenennen der neuen Variable
+names(df_gdp)[names(df_gdp) == "EinstellungDichotom.y"] <- "MWEinstellung"
+
+library(ggplot2)
+
+ggplot(df_gdp, 
+       aes(x = GDPpcapita2009,
+           y = MWEinstellung, 
+           label = Entity
+           )
+       ) +
+  geom_point(size = 4, color = "darkblue", alpha = 0.8) +
+  geom_text(hjust = 0, vjust = 0, color = "black", fontface = "bold")+
+  labs(x = "BIP pro Kopf 2009 (in $)",
+       y = "Einstellung zur EU (nach Mittelwerten)",
+       title = "Einstellung zur EU nach BIP pro Kopf 2009")+
+  theme_minimal()
+
+ggplot(df_gdp, 
+       aes(x = GDPpcapita2009,
+           y = MWEinstellung, 
+           label = Entity
+       )
+) +
+  geom_point(size = 4, color = "darkblue", alpha = 0.8) +
+  geom_text_repel(
+    segment.size = 0.2, force = 10,
+    segment.color = "darkgray", segment.alpha = 0.6,
+    hjust = 0, vjust = 0, color = "black", fontface = "bold")+
+  labs(x = "BIP pro Kopf 2009 (in $)",
+       y = "Einstellung zur EU (nach Mittelwerten)",
+       title = "Einstellung zur EU nach BIP pro Kopf 2009")+
+  theme_minimal()
