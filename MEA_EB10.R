@@ -56,36 +56,56 @@ DatensatzEB$Bildungsjahre_recoded[DatensatzEB$Bildungsjahre_recoded == 11] <- 0 
 ###Ländernamen zum mergen
 DatensatzEB$Entity <- NA
 
-clean_data$Entity[clean_data$Land == 1] <- "France"
-clean_data$Entity[clean_data$Land == 2] <- "Belgium"
-clean_data$Entity[clean_data$Land == 3] <- "Netherlands"
-clean_data$Entity[clean_data$Land == 4] <- "Germany" #West
-clean_data$Entity[clean_data$Land == 5] <- "Italy"
-clean_data$Entity[clean_data$Land == 6] <- "Luxembourg"
-clean_data$Entity[clean_data$Land == 7] <- "France"
-clean_data$Entity[clean_data$Land == 8] <- "Ireland"
-clean_data$Entity[clean_data$Land == 9] <- "Great Britain"
-clean_data$Entity[clean_data$Land == 10] <- "Northern Ireland"
-clean_data$Entity[clean_data$Land == 11] <- "Greece"
-clean_data$Entity[clean_data$Land == 12] <- "Spain"
-clean_data$Entity[clean_data$Land == 13] <- "Portugal"
-clean_data$Entity[clean_data$Land == 14] <- "Germany" #Ost
-#clean_data$Entity[clean_data$Land == 15] <- gibts nicht
-clean_data$Entity[clean_data$Land == 16] <- "Finnland"
-clean_data$Entity[clean_data$Land == 17] <- "Sweden"
-clean_data$Entity[clean_data$Land == 18] <- "Austria"
-clean_data$Entity[clean_data$Land == 19] <- "Cyprus"
-clean_data$Entity[clean_data$Land == 20] <- "Czech Republic"
-clean_data$Entity[clean_data$Land == 21] <- "Estonia"
-clean_data$Entity[clean_data$Land == 22] <- "Hungary"
-clean_data$Entity[clean_data$Land == 23] <- "Latvia"
-clean_data$Entity[clean_data$Land == 24] <- "Lithuania"
-clean_data$Entity[clean_data$Land == 25] <- "Malta"
-clean_data$Entity[clean_data$Land == 26] <- "Poland"
-clean_data$Entity[clean_data$Land == 27] <- "Slovakia"
-clean_data$Entity[clean_data$Land == 28] <- "Slovenia"
-clean_data$Entity[clean_data$Land == 29] <- "Bulgaria"
-clean_data$Entity[clean_data$Land == 30] <- "Romania"
+DatensatzEB$Entity[DatensatzEB$Land == 1] <- "France"
+DatensatzEB$Entity[DatensatzEB$Land == 2] <- "Belgium"
+DatensatzEB$Entity[DatensatzEB$Land == 3] <- "Netherlands"
+DatensatzEB$Entity[DatensatzEB$Land == 4] <- "Germany" #West
+DatensatzEB$Entity[DatensatzEB$Land == 5] <- "Italy"
+DatensatzEB$Entity[DatensatzEB$Land == 6] <- "Luxembourg"
+DatensatzEB$Entity[DatensatzEB$Land == 7] <- "France"
+DatensatzEB$Entity[DatensatzEB$Land == 8] <- "Ireland"
+DatensatzEB$Entity[DatensatzEB$Land == 9] <- "Great Britain"
+DatensatzEB$Entity[DatensatzEB$Land == 10] <- "Northern Ireland"
+DatensatzEB$Entity[DatensatzEB$Land == 11] <- "Greece"
+DatensatzEB$Entity[DatensatzEB$Land == 12] <- "Spain"
+DatensatzEB$Entity[DatensatzEB$Land == 13] <- "Portugal"
+DatensatzEB$Entity[DatensatzEB$Land == 14] <- "Germany" #Ost
+#DatensatzEB$Entity[DatensatzEB$Land == 15] <- gibts nicht
+DatensatzEB$Entity[DatensatzEB$Land == 16] <- "Finnland"
+DatensatzEB$Entity[DatensatzEB$Land == 17] <- "Sweden"
+DatensatzEB$Entity[DatensatzEB$Land == 18] <- "Austria"
+DatensatzEB$Entity[DatensatzEB$Land == 19] <- "Cyprus"
+DatensatzEB$Entity[DatensatzEB$Land == 20] <- "Czech Republic"
+DatensatzEB$Entity[DatensatzEB$Land == 21] <- "Estonia"
+DatensatzEB$Entity[DatensatzEB$Land == 22] <- "Hungary"
+DatensatzEB$Entity[DatensatzEB$Land == 23] <- "Latvia"
+DatensatzEB$Entity[DatensatzEB$Land == 24] <- "Lithuania"
+DatensatzEB$Entity[DatensatzEB$Land == 25] <- "Malta"
+DatensatzEB$Entity[DatensatzEB$Land == 26] <- "Poland"
+DatensatzEB$Entity[DatensatzEB$Land == 27] <- "Slovakia"
+DatensatzEB$Entity[DatensatzEB$Land == 28] <- "Slovenia"
+DatensatzEB$Entity[DatensatzEB$Land == 29] <- "Bulgaria"
+DatensatzEB$Entity[DatensatzEB$Land == 30] <- "Romania"
 
 
-table(clean_data$Entity)
+table(DatensatzEB$Entity)
+
+
+##GDP Datensatz
+GDP <- filter(gdp, Year == 2009)  #2009 rausfiltern 
+#Länder filtern
+eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
+                "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+                "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
+                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
+
+GDP2 <- subset(GDP, Entity %in% eu_laender)
+
+#Continent, Year, Population, Code löschen
+
+gdp_per_capita_b2$Continent <- NULL
+gdp_per_capita_b2$Year <- NULL
+gdp_per_capita_b2$Code <- NULL
+
+colnames(gdp_per_capita_b2)[4] <- "Population"
+gdp_per_capita_b2$Population <- NULL
