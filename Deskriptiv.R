@@ -1,8 +1,17 @@
+library(haven)
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+
 #### Deskriptive Statistik ####
 
 #### TO DO ####
 
 #Legenden
+
+#Länder?BIP?
 
 #### AV: Zustimmung ####
 
@@ -28,7 +37,7 @@ barplot(table(percentages),
         names.arg = c("0", "1") #ohne Prozent angezeigt 48% zu 52%
 )
 
-legend("bottom",
+legend("top",
        c("0: Ablehnung ",
          "1: Zustimmung"),
        pch = 15, 
