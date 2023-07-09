@@ -358,3 +358,7 @@ cm <- c('BJ_gruppiert_scaled'    = 'Bildungsjahre gruppiert',
 #Modellzusammenfassung und speichern als docx
 modelsummary(fit_rescaled, coef_rename = cm, stars = TRUE, output = "tabelle.docx",
              title = 'Multilevel Regression Model Ergebnisse Einstellungen zur EU.')
+
+#Deskriptive Output
+library(stargazer)
+stargazer(df_final, title = "Deskriptive Statistik und Kodierung der modellspezifischen Variablen")
