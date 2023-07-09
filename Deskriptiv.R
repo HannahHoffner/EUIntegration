@@ -9,44 +9,23 @@ library(gridExtra)
 
 #### TO DO ####
 
-#Legenden
-
-#Länder?BIP?
-
 #### AV: Zustimmung ####
 
-#Absolute Häufigkeiten
+p2 <- table(df_final$EinstellungDichotom)
 
-abs_freq <- table(df_final$EinstellungDichotom)
+p2
 
-#0: 10.716
-#1: 11518
-
-#Prozentsätze
-
-percentages <- round(100 * abs_freq / sum(abs_freq))
-
-
-#barplot in Prozent
-
-barplot(table(percentages), 
-        col = "lightblue", 
-        main = "Verteilung der Einstellungen zur EU",
-        xlab = "Ablehnung (0) oder Zustimmung (1) zur EU", 
-        ylab = "Prozentuale Anteil",
-        names.arg = c("0", "1") #ohne Prozent angezeigt 48% zu 52%
-)
-
-legend("top",
-       c("0: Ablehnung ",
-         "1: Zustimmung"),
-       pch = 15, 
-       cex = 0.5
-)
-
-?legend
+#0: Ablehnung 10.716
+#1: Zustimmung 11518
 
 #### UV: Bildungsjahre ####
+
+
+#Überblick
+
+prop.table(table(df_final$BJ_gruppiert))
+
+prop.table(table(df_final$BJ_gruppiert))*100
 
 #irgendwie alle bei 9 und ansonsten konstant in Prozent 
 
@@ -69,8 +48,7 @@ legend("topleft",
            "7: 20 Bildungsjahre",
            "8: 21 Bildungsjahre",
            "9: 22 Bildungsjahre und mehr",
-           "10: still studying",
-           "11: no-fulltime education"),
+           "10: still studying"),
        pch = 15, 
        cex = 0.4
 )
@@ -252,4 +230,16 @@ plot_geschlecht <- grid.arrange(plotC, k2, ncol = 2, widths = c(0.7, 0.25))
 
 #Männer stimmen eher zu
 
+#### Deskriptive Output ####
 
+library(stargazer)
+stargazer(df_final,
+          title = "Deskriptive Statistik und Kodierung der modellspezifischen Variablen")
+
+#### Deskreptiver Output ####
+
+install.packages("psych")
+library(psych)
+ 
+
+describe(df_final$EinstellungDichotom, df_final$Geschlecht)
