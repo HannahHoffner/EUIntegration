@@ -211,7 +211,7 @@ s1 <- glmer(EinstellungDichotom ~ Geschlecht_recoded + Alter_gruppiert + GDPpcap
 s2 <- update(s1, . ~ . + BJ_gruppiert_centered)
 
 
-###Output:
+###Output: https://francish.net/mlmusingr/MLM_Appendix_A.pdf
 cm <- c('BJ_gruppiert_centered'    = 'Bildungsjahre gruppiert',
         'Geschlecht_recoded'    = 'Geschlecht',
         'Alter_gruppiert' = 'Alter',
