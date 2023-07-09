@@ -102,10 +102,20 @@ eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
 GDP2 <- subset(GDP, Entity %in% eu_laender)
 
 #Continent, Year, Population, Code löschen
+GDP2$Continent <- NULL
+GDP2$Year <- NULL
+GDP2$Code <- NULL
 
-gdp_per_capita_b2$Continent <- NULL
-gdp_per_capita_b2$Year <- NULL
-gdp_per_capita_b2$Code <- NULL
+colnames(GDP2)[4] <- "Population"
+GDP2$Population <- NULL
 
-colnames(gdp_per_capita_b2)[4] <- "Population"
-gdp_per_capita_b2$Population <- NULL
+#### Datensätze zusammenfügen ####
+
+DatensatzGesamt <- merge(DatensatzEB, GDP2, by = "Entity")
+
+DatensatzGesamt$Bildungsjahre <- NULL # Bildungsjahre Alter
+DatensatzGesamt$Geschlecht <- NULL #Geschlecht alte Kodierung
+DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL#GDP unnötig
+colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"
+
+
