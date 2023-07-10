@@ -185,22 +185,50 @@ AIM_cmc <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert +
              weights = Gewichtung_Land)
 summary(AIM_cmc)
 
+#Random Effects, Random Slopes mit allen Level1-Variablen
+AIM_cmc2 <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered 
+                  + Alter_gruppiert 
+                  + Geschlecht_recoded 
+                  + GDPpcapita2009 
+                  + (1 + BJ_gruppiert_centered + Geschlecht_recoded + Alter_gruppiert|| Entity),
+                 data = DatensatzGesamt,
+                 family = "binomial",
+                 weights = Gewichtung_Land)
+summary(AIM_cmc2)  #Varianzen der Random Effects sehr gering! --> könnten auch weggelassen werden
+anova (AIM_cmc, AIM_cmc2)
 #Testen ob Miteinbeziehung von random slope der Bildung das Modell verbessert 
 #likelihood-ratio test LR X(1)²,  Vergleich der deviance bei CIM und AIM
 anova(CIM, AIM)
 anova(CIM_cmc, AIM_cmc)
 
 #final model (inklusive cross-level interaction) 
-FM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 +  (1 + BJ_gruppiert_centeredGrandMean || Entity) + BJ_gruppiert_centeredGrandMean:GDPpcapita2009,
+FM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean 
+            + Alter_gruppiert 
+            + Geschlecht_recoded 
+            + GDPpcapita2009 
+            + BJ_gruppiert_centeredGrandMean:GDPpcapita2009
+            + (1 + BJ_gruppiert_centeredGrandMean || Entity),
             data = DatensatzGesamt,
             family = "binomial",
             weights = Gewichtung_Land)
 summary(FM)
 
+crosslevel <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered
+                    + Alter_gruppiert 
+                    + Geschlecht_recoded 
+                    + GDPpcapita2009
+                    + BJ_gruppiert_centered:GDPpcapita2009
+                    + (1 + BJ_gruppiert_centered + Geschlecht_recoded + Alter_gruppiert|| Entity),
+                    data = DatensatzGesamt,
+                    family = "binomial",
+                    weights = Gewichtung_Land)
+summary(crosslevel)
+
 ## Vergleich von Mehrebenen (glmer) zu nicht (glm)
 GLM <-  glm(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + BJ_gruppiert_centered:GDPpcapita2009, data = DatensatzGesamt, family = "binomial")
 summary (GLM)
 
+##########################################################
 #Calculate Odds-Ratios
 #OR <- exp(fixef(AIM_cmc))
 #CI <- exp(confint(AIM_cmc,parm="beta_"))
@@ -209,7 +237,7 @@ summary (GLM)
 s1 <- glmer(EinstellungDichotom ~ Geschlecht_recoded + Alter_gruppiert + GDPpcapita2009 + (1|Entity), family = binomial,
             data = DatensatzGesamt)
 s2 <- update(s1, . ~ . + BJ_gruppiert_centered)
-
+##########################################################
 
 ###Output: https://francish.net/mlmusingr/MLM_Appendix_A.pdf
 cm <- c('BJ_gruppiert_centered'    = 'Bildungsjahre gruppiert',
@@ -219,7 +247,7 @@ cm <- c('BJ_gruppiert_centered'    = 'Bildungsjahre gruppiert',
         '(Intercept)' = 'Constant',
         'SD (BJ_gruppiert_centered Entity)' = 'SD Bildungsjahre gruppiert, Land'
         )
-modelsummary(list(s1, s2, CIM_cmc, AIM_cmc),
+modelsummary(list(s1, s2, CIM_cmc, AIM_cmc, AIM_cmc2),
              coef_rename = cm,
              statistic = "({conf.low}, {conf.high})",
              exponentiate = TRUE, stars = TRUE,
@@ -228,5 +256,78 @@ modelsummary(list(s1, s2, CIM_cmc, AIM_cmc),
              dep.var.labels = c("Einstellung gegenüber der EU")
              )
 
-
 modelsummary(M0)
+
+
+################################
+#Mit Skalierten, nach Land gewichteten, am Gruppenmittelwert zentrierten Werten:
+# Rescale variables - z-Transformation
+DatensatzGesamt$BJsc <- scale(DatensatzGesamt$BJ_gruppiert_centered)
+DatensatzGesamt$Altsc <- scale(DatensatzGesamt$Alter_gruppiert)
+DatensatzGesamt$GDPsc <- scale(DatensatzGesamt$GDPpcapita2009)
+
+#Nullmodell(bleibt gleich)
+M0 <- glmer(EinstellungDichotom ~ ( 1 | Entity),
+            data=DatensatzGesamt,
+            family = "binomial",
+            weights = Gewichtung_Land)
+summary(M0)
+#ICC
+iccM0 <-icc(M0)
+iccM0
+
+#Fixed Slope
+fixedslope <- glmer(EinstellungDichotom ~ BJsc 
+                    + Altsc 
+                    + Geschlecht_recoded 
+                    + GDPsc + (1 | Entity),
+                 data = DatensatzGesamt,
+                 family = "binomial",
+                 weights = Gewichtung_Land)
+summary(fixedslope)
+
+#Random Slope für alle UV der Ebene 1
+randomslope <- glmer(EinstellungDichotom ~ BJsc 
+                  + Altsc 
+                  + Geschlecht_recoded 
+                  + GDPsc 
+                  + (1 + BJsc + Geschlecht_recoded + Altsc|| Entity),
+                  data = DatensatzGesamt,
+                  family = "binomial",
+                  weights = Gewichtung_Land)
+summary(randomslope)
+
+#Vergleich der Devianzen
+anova(fixedslope, randomslope) #24180-24118=62, signifikant (Miteinbezug des Residualterms sinnvoll!)
+
+#Plus Cross-Level-Interaction
+crosslevelsc <- glmer(EinstellungDichotom ~ BJsc
+                    + Altsc 
+                    + Geschlecht_recoded 
+                    + GDPsc
+                    + BJsc:GDPsc
+                    + (1 + BJsc + Geschlecht_recoded + Altsc|| Entity),
+                    data = DatensatzGesamt,
+                    family = "binomial",
+                    weights = Gewichtung_Land)
+summary(crosslevelsc)
+
+
+###Output: https://francish.net/mlmusingr/MLM_Appendix_A.pdf
+coefmap <- c('BJsc'    = 'Bildungsjahre gruppiert',
+        'Geschlecht_recoded'    = 'Geschlecht',
+        'Altsc' = 'Alter',
+        'GDPsc' = 'GDP von 2009',
+        '(Intercept)' = 'Constant',
+        'SD (BJsc Entity)' = 'SD Bildungsjahre gruppiert, Land',
+        'SD (Geschlecht_recoded Entity)' = 'SD Geschlecht, Land',
+        'SD (Altsc Entity)' = 'SD Alter, Land',
+        'BJsc:GDPsc' = 'Cross-Level-Interaktion Bildungsjahre, GDP'
+)
+modelsummary(list(fixedslope, randomslope, crosslevelsc),
+             coef_rename = coefmap,
+             statistic = "({conf.low}, {conf.high})",
+             exponentiate = TRUE, stars = TRUE,
+             coef_omit = "Intercept",
+             title = 'Multilevel Logistic Regression Model Results Predicting Suspensions Using Odds Ratios (ORs)'
+)
