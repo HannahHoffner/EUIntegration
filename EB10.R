@@ -44,6 +44,7 @@ df_1 <- select(df_1,
                Land = v6, 
                LandGewichtung = v40,
                Zustimmung_EU = v206, 
+               BJ_original = v553,
                BJ_recoded = v554,
                Gender = v555,
                Alter = v556,
@@ -65,6 +66,7 @@ clean_data$Geschlecht[clean_data$Gender == 2] <- 0 #female
 
 
 #ZustimmungDichotom: good=1, bad&neither good nor bad=0, dk=löschen (??)
+
 ## Erstellung einer neuen Variable "EinstellungDichotom" mit NAs als Standardwert
 clean_data$EinstellungDichotom <- NA
 
@@ -78,22 +80,63 @@ clean_data <- clean_data[!clean_data$Zustimmung_EU %in% c(4, 9), ]
 ## Überprüfung der neuen Variable
 table(clean_data$EinstellungDichotom)
 
-#Bildung gruppiert neu kodiert:
-# Umkodierung der Antwortkategorien von BJ_recoded in clean_data
-clean_data$BJ_gruppiert <- clean_data$BJ_recoded
+
+
+## Einstellung in 3 Kategorien 
+
+#neue Variable
+clean_data$Einstellung3 <- NA
+
+## Umkodierung und Zuordnung 
+
+clean_data$Einstellung3[clean_data$Zustimmung_EU == 3] <- 0 #wedernoch
+
+clean_data$Einstellung3[clean_data$Zustimmung_EU == 1] <- 1 #good
+
+clean_data$Einstellung3[clean_data$Zustimmung_EU == 2] <- 2 #bad
+
+
+## Überprüfung der neuen Variable
+table(clean_data$Einstellung3)
+
+
+
+
+##Bildung neu kodieren ##
+
+#neue Variable um Bildung in primär, senkundär, tertiär und noch im 
+#Bildungssystem zu Kategorisieren
+clean_data$BJ_gruppiert <- NA
 
 # Löschen der Fälle mit den Antworten 97 und 98
-clean_data <- clean_data[!(clean_data$BJ_gruppiert %in% c(97, 98)), ]
+clean_data <- clean_data[!(clean_data$BJ_recoded %in% c(97, 98)), ]
 
-# Umkodierung der Antwortkategorie 11 (no full time) zu 0
-clean_data$BJ_gruppiert[clean_data$BJ_gruppiert == 11] <- 0
+# Umkodierung von 0-15 BJ zu 0
+clean_data$BJ_gruppiert[clean_data$BJ_recoded == 1] <- 0 #bis 14
+clean_data$BJ_gruppiert[clean_data$BJ_recoded == 2] <- 0 #15
+clean_data$BJ_gruppiert[clean_data$BJ_recoded == 11] <- 0 #nofulltime
+
+# Umkodierung von 16-19 BJ zu 1
+clean_data$BJ_gruppiert[clean_data$BJ_recoded >= 3 & clean_data$BJ_recoded <= 6] <- 1 
+
+# Umkodierung über 20 BJ zu 2
+clean_data$BJ_gruppiert[clean_data$BJ_recoded >= 7 & clean_data$BJ_recoded <= 9] <- 2 
+
+#Umkodierung noch im Bildungssystem zu 4
+
+clean_data$BJ_gruppiert[clean_data$BJ_recoded == 10] <- 4
+
 
 # Überprüfung der neuen Variable
 table(clean_data$BJ_gruppiert)
 
+
+
+
+
 table(clean_data$Land)
 
-#Ländernamen zum mergen 
+##Ländernamen zum mergen 
 
 
 clean_data$Entity <- NA
@@ -359,6 +402,3 @@ cm <- c('BJ_gruppiert_scaled'    = 'Bildungsjahre gruppiert',
 modelsummary(fit_rescaled, coef_rename = cm, stars = TRUE, output = "tabelle.docx",
              title = 'Multilevel Regression Model Ergebnisse Einstellungen zur EU.')
 
-#Deskriptive Output
-library(stargazer)
-stargazer(df_final, title = "Deskriptive Statistik und Kodierung der modellspezifischen Variablen")
