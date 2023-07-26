@@ -149,8 +149,8 @@ clean_data$Entity[clean_data$Land == 5] <- "Italy"
 clean_data$Entity[clean_data$Land == 6] <- "Luxembourg"
 clean_data$Entity[clean_data$Land == 7] <- "France"
 clean_data$Entity[clean_data$Land == 8] <- "Ireland"
-clean_data$Entity[clean_data$Land == 9] <- "Great Britain"
-clean_data$Entity[clean_data$Land == 10] <- "Northern Ireland"
+clean_data$Entity[clean_data$Land == 9] <- "United Kingdom" #Great Britian
+clean_data$Entity[clean_data$Land == 10] <- "United Kingdom" #Nordirland
 clean_data$Entity[clean_data$Land == 11] <- "Greece"
 clean_data$Entity[clean_data$Land == 12] <- "Spain"
 clean_data$Entity[clean_data$Land == 13] <- "Portugal"
@@ -195,7 +195,7 @@ gdp_per_capita_b1 <- filter(gdp_per_capita_bereinigt, Year == 2009)
 eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
                 "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
                 "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
-                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
+                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "United Kingdom")
 
 gdp_per_capita_b2 <- subset(gdp_per_capita_b1,
                             Entity %in% eu_laender)
