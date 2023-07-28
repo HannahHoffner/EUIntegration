@@ -118,7 +118,8 @@ DatensatzEB$Entity[DatensatzEB$Land == 28] <- "Slovenia"
 DatensatzEB$Entity[DatensatzEB$Land == 29] <- "Bulgaria"
 DatensatzEB$Entity[DatensatzEB$Land == 30] <- "Romania"
 
-##GDP Datensatz
+##############################GDP logaritmiert in die MEA aufnehmen?????????? Quadriert plus normal?????
+##GDP Datensatz   
 GDP <- filter(gdp, Year == 2009)  #2009 rausfiltern 
 #Länder filtern
 eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
