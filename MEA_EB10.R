@@ -48,7 +48,39 @@ DatensatzEB$EinstellungDichotom[DatensatzEB$Einstellung_EU == 1] <- 1          #
 DatensatzEB$EinstellungDichotom[DatensatzEB$Einstellung_EU %in% c(2, 3)] <- 0  #schlecht, weder noch
 DatensatzEB <- DatensatzEB[!DatensatzEB$Einstellung_EU %in% c(4, 9), ]         # Löschen der Fälle mit den Antworten 4 (dont know) und 9(inap)
 
-#Bildung gruppiert neu kodiert:
+
+## Einstellung in 3 Kategorien 
+#neue Variable
+DatensatzEB$Einstellung3 <- NA
+## Umkodierung und Zuordnung 
+DatensatzEB$Einstellung3[DatensatzEB$Einstellung_EU == 3] <- 0 #wedernoch
+DatensatzEB$Einstellung3[DatensatzEB$Einstellung_EU == 1] <- 1 #good
+DatensatzEB$Einstellung3[DatensatzEB$Einstellung_EU == 2] <- 2 #bad
+## Überprüfung der neuen Variable
+table(DatensatzEB$Einstellung3)
+
+##Bildung neu kodieren ##
+#neue Variable um Bildung in primär, senkundär, tertiär und noch im 
+#Bildungssystem zu Kategorisieren
+DatensatzEB$BJ_gruppiert <- NA
+
+# Löschen der Fälle mit den Antworten 97 und 98
+DatensatzEB <- DatensatzEB[!(DatensatzEB$Bildungsjahre_kategorisiert %in% c(97, 98)), ]
+# Umkodierung von 0-15 BJ zu 0
+DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert == 1] <- 0 #bis 14
+DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert == 2] <- 0 #15
+DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert == 11] <- 0 #nofulltime
+# Umkodierung von 16-19 BJ zu 1
+DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert >= 3 & DatensatzEB$Bildungsjahre_kategorisiert <= 6] <- 1 
+# Umkodierung über 20 BJ zu 2
+DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert >= 7 & DatensatzEB$Bildungsjahre_kategorisiert <= 9] <- 2 
+#Umkodierung noch im Bildungssystem zu 4
+DatensatzEB$BJ_gruppiert[clean_data$Bildungsjahre_kategorisiert == 10] <- 4
+# Überprüfung der neuen Variable
+table(DatensatzEB$BJ_gruppiert)
+
+
+#Bildung gruppiert neu kodiert: falsch, weil ordinal angenommen & noch in Studium als höchstes angenommen
 DatensatzEB$Bildungsjahre_recoded <- DatensatzEB$Bildungsjahre_kategorisiert     # Umkodierung der Antwortkategorien
 DatensatzEB <- DatensatzEB[!(DatensatzEB$Bildungsjahre_recoded %in% c(97, 98)), ]# Löschen der Fälle mit den Antworten 97 und 98
 DatensatzEB$Bildungsjahre_recoded[DatensatzEB$Bildungsjahre_recoded == 11] <- 0  # Umkodierung der Antwortkategorie 11 (no full time) zu 0
