@@ -11,6 +11,7 @@ library(misty)      #Zentrierung
 library(stargazer)  #Output
 library(performance)#ICC
 library(dplyr)      #BIP quadrieren
+library(survey)     #Gewichtung
 
 
 #Daten einlesen
@@ -62,8 +63,8 @@ DatensatzEB$Entity[DatensatzEB$Land == 5] <- "Italy"
 DatensatzEB$Entity[DatensatzEB$Land == 6] <- "Luxembourg"
 DatensatzEB$Entity[DatensatzEB$Land == 7] <- "France"
 DatensatzEB$Entity[DatensatzEB$Land == 8] <- "Ireland"
-DatensatzEB$Entity[DatensatzEB$Land == 9] <- "Great Britain"
-DatensatzEB$Entity[DatensatzEB$Land == 10] <- "Northern Ireland"
+DatensatzEB$Entity[DatensatzEB$Land == 9] <- "United Kingdom" #GB ohne Nordirland
+DatensatzEB$Entity[DatensatzEB$Land == 10] <- "United Kingdom" #Nordirland
 DatensatzEB$Entity[DatensatzEB$Land == 11] <- "Greece"
 DatensatzEB$Entity[DatensatzEB$Land == 12] <- "Spain"
 DatensatzEB$Entity[DatensatzEB$Land == 13] <- "Portugal"
@@ -91,7 +92,7 @@ GDP <- filter(gdp, Year == 2009)  #2009 rausfiltern
 eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
                 "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
                 "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
-                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden")
+                "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "United Kingdom")
 
 GDP2 <- subset(GDP, Entity %in% eu_laender)
 
@@ -112,6 +113,9 @@ colnames(DatensatzGesamt)[11] <- "GDPpcapita2009" #Umbenennung Spalte
 # Neue quadrierte BIPVariable hinzufügen
 DatensatzGesamt <- DatensatzGesamt %>% 
   mutate(bip_squared = GDPpcapita2009^2)  ##quadriertes BIP nicht signifikant, daher mit normalem weitergerechnet!
+
+#Gewichten nach Population Size
+DatensatzGesamt.w <- svydesign(ids =~ 1, data = DatensatzGesamt, weights =~ Gewichtung_Land)
 
 ###Mehrebenenanalyse
 
