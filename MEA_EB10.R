@@ -11,7 +11,6 @@ library(misty)      #Zentrierung
 library(stargazer)  #Output
 library(performance)#ICC
 library(dplyr)      #BIP quadrieren
-library(survey)     #Gewichtung
 
 
 #Daten einlesen
@@ -147,8 +146,6 @@ colnames(DatensatzGesamt)[11] <- "GDPpcapita2009" #Umbenennung Spalte
 DatensatzGesamt <- DatensatzGesamt %>% 
   mutate(bip_squared = GDPpcapita2009^2)  ##quadriertes BIP nicht signifikant, daher mit normalem weitergerechnet!
 
-#Gewichten nach Population Size
-DatensatzGesamt.w <- svydesign(ids =~ 1, data = DatensatzGesamt, weights =~ Gewichtung_Land)
 
 ###Mehrebenenanalyse
 
@@ -173,19 +170,35 @@ DatensatzGesamt$BJ_gruppiert_centeredGrandMean <- center(DatensatzGesamt$Bildung
 #Below are the commands to run an empty model, that is, a model containing no predictors, 
 # and calculate the intraclass correlation coefficient (ICC; the degree of homogeneity of the outcome within clusters).
 
-M0 <- glmer(EinstellungDichotom ~ ( 1 | Entity),
+
+####Leermodell mit weights-Gewichtung auf DatensatzGesamt Einstellung 2-geteilt
+M02a <- glmer(EinstellungDichotom ~ ( 1 | Entity),
             data=DatensatzGesamt,
             family = "binomial",
             weights = Gewichtung_Land)
-summary(M0)
+summary(M02a)
 
-icc <- M0@theta[1]^2/ (M0@theta[1]^2 + (3.14159^2/3))
-icc #Ergebnis: 0.0692001
+iccM02a <- M02a@theta[1]^2/ (M02a@theta[1]^2 + (3.14159^2/3))
+iccM02a #Ergebnis: 0.0692001
 # bei gewichteten Ländern: 0.0409
 
-icc_mit_Paket <-icc(M0)
-icc_mit_Paket #Ergebnis ist gleich: Adjusted ICC: 0.069, Unadjusted ICC: 0.069, gewichtete Länder: 0.041
+icc_mit_PaketM02a <-icc(M02a)
+icc_mit_PaketM02a #Ergebnis ist gleich: Adjusted ICC: 0.069, Unadjusted ICC: 0.069, gewichtete Länder: 0.041
 
+
+####Leermodell ohne Gewichtung auf DatensatzGesamt Einstellung 2-geteilt
+M02b <- glmer(EinstellungDichotom ~ ( 1 | Entity),
+              data=DatensatzGesamt,
+              family = "binomial",
+              )
+summary(M02b)
+
+iccM02b <- M02b@theta[1]^2/ (M02b@theta[1]^2 + (3.14159^2/3))
+iccM02b #Ergebnis: 0.0692001
+# bei gewichteten Ländern: 0.0409
+
+icc_mit_PaketM02b <-icc(M02b)
+icc_mit_PaketM02b
 
 #If you focus on the between-observation effect of the (level-1) variable, you can use the grand-mean centered variable ("gpa_gmc"). 
 #If you focus on the within-cluster effect, use the cluster-mean centered variable ("gpa_cmc"). 
