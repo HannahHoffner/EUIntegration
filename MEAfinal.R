@@ -164,10 +164,8 @@ DatensatzGesamt$BJ_gruppiert_centeredGrandMean <- center(DatensatzGesamt$Bildung
 #df_final$GDPpcapita2009_centered <- center(df_final$GDPpcapita2009, type="CWC", cluster=df_final$Entity)                ## unnötig da schon zentriert
 
 
-#Step 1: Leermodell
-#Below are the commands to run an empty model, that is, a model containing no predictors, 
-# and calculate the intraclass correlation coefficient (ICC; the degree of homogeneity of the outcome within clusters).
-
+#Step 1: Leermodell (model containing no predictors)
+# calculate the intraclass correlation coefficient (ICC; the degree of homogeneity of the outcome within clusters).
 
 ####Leermodell mit weights-Gewichtung auf DatensatzGesamt Einstellung 2-geteilt
 M02a <- glmer(EinstellungDichotom ~ ( 1 | Entity),
