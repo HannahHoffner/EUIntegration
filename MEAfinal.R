@@ -21,7 +21,7 @@ gdp <- read_csv("gdp-per-capita-inflation--and-ppp-adjusted-world-bank-data-vs-p
 ##EB10
 ###Variablenauswahl und Umbenennung
 EuBa_Vars <- select(EuBa,
-                    Land = v684,
+                    Land = NATION,
                     Gewichtung_Land = v40,
                     Einstellung_EU = v206,
                     Bildungsjahre = v553,
