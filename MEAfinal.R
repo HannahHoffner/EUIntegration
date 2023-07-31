@@ -204,7 +204,7 @@ M03a <- lmer(Einstellung3 ~ 1 + ( 1 | Entity),
 summary(M03a)
 
 #ICC
-icc_mit_PaketM03a <-icc(M03a) Adjusted ICC: 0.046
+icc_mit_PaketM03a <-icc(M03a) #Adjusted ICC: 0.046
 icc_mit_PaketM03a 
 
 
