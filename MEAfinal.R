@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #Mehrebenenanalyse zum Einfluss des Bildungsniveaus auf Einstellung zur EU
 ##Daten: Eurobarometer 2010
 
@@ -12,6 +11,7 @@ library(misty)      #Zentrierung
 library(stargazer)  #Output
 library(performance)#ICC
 library(dplyr)      #BIP quadrieren
+library(ordinal)    #3-geteilte AV MEA
 
 
 #Daten einlesen
@@ -53,8 +53,8 @@ EuBaDaten <- EuBaDaten[!EuBaDaten$Einstellung_EU %in% c(4, 9), ]         # Lösc
 #neue Variable
 EuBaDaten$Einstellung3 <- NA
 ## Umkodierung und Zuordnung 
-EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 3] <- 0 #wedernoch
-EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 1] <- 1 #good
+EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 3] <- 1 #wedernoch
+EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 1] <- 0 #good
 EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 2] <- 2 #bad
 ## Überprüfung der neuen Variable
 table(EuBaDaten$Einstellung3)
@@ -177,12 +177,11 @@ M02a <- glmer(EinstellungDichotom ~ ( 1 | Entity),
 summary(M02a)
 
 iccM02a <- M02a@theta[1]^2/ (M02a@theta[1]^2 + (3.14159^2/3))
-iccM02a #Ergebnis: 0.0692001
+iccM02a #Ergebnis: 0.054045
 # bei gewichteten Ländern: 0.0409
 
-icc_mit_PaketM02a <-icc(M02a)
-icc_mit_PaketM02a #Ergebnis ist gleich: Adjusted ICC: 0.069, Unadjusted ICC: 0.069, gewichtete Länder: 0.041
-
+icc_mit_PaketM02a <-icc(M02a) #Adjusted ICC: 0.054
+icc_mit_PaketM02a 
 
 ####Leermodell ohne Gewichtung auf DatensatzGesamt Einstellung 2-geteilt
 M02b <- glmer(EinstellungDichotom ~ ( 1 | Entity),
@@ -192,11 +191,31 @@ M02b <- glmer(EinstellungDichotom ~ ( 1 | Entity),
 summary(M02b)
 
 iccM02b <- M02b@theta[1]^2/ (M02b@theta[1]^2 + (3.14159^2/3))
-iccM02b #Ergebnis: 0.0692001
-# bei gewichteten Ländern: 0.0409
+iccM02b #Ergebnis: 0.07482931
 
-icc_mit_PaketM02b <-icc(M02b)
+icc_mit_PaketM02b <-icc(M02b) #Adjusted ICC: 0.075
 icc_mit_PaketM02b
+
+
+####Leermodell mit weights-Gewichtung auf DatensatzGesamt Einstellung 3-geteilt
+M03a <- lmer(Einstellung3 ~ 1 + ( 1 | Entity),
+              data=DatensatzGesamt,
+              weights = Gewichtung_Land)
+summary(M03a)
+
+#ICC
+icc_mit_PaketM03a <-icc(M03a) Adjusted ICC: 0.046
+icc_mit_PaketM03a 
+
+
+####Leermodell ohne Gewichtung auf DatensatzGesamt Einstellung 3-geteilt
+M03b <- lmer(Einstellung3 ~ 1 + ( 1 | Entity),
+              data=DatensatzGesamt)
+summary(M03b)
+
+#ICC
+icc_mit_PaketM03b <-icc(M03b) #Adjusted ICC: 0.054
+icc_mit_PaketM03b
 
 #If you focus on the between-observation effect of the (level-1) variable, you can use the grand-mean centered variable ("gpa_gmc"). 
 #If you focus on the within-cluster effect, use the cluster-mean centered variable ("gpa_cmc"). 
