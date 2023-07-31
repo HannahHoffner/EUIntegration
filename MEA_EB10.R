@@ -74,7 +74,7 @@ DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert >= 3 & Datensat
 # Umkodierung über 20 BJ zu 2
 DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert >= 7 & DatensatzEB$Bildungsjahre_kategorisiert <= 9] <- 2 
 #Umkodierung noch im Bildungssystem zu 4
-DatensatzEB$BJ_gruppiert[clean_data$Bildungsjahre_kategorisiert == 10] <- 4
+DatensatzEB$BJ_gruppiert[DatensatzEB$Bildungsjahre_kategorisiert == 10] <- 4
 # Überprüfung der neuen Variable
 table(DatensatzEB$BJ_gruppiert)
 
