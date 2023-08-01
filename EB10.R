@@ -138,47 +138,7 @@ clean_data$BJ_gruppiert[clean_data$BJ_recoded == 10] <- 4
 # Überprüfung der neuen Variable
 table(clean_data$BJ_gruppiert)
 
-##Politik umkodieren
 
-#niemand mit 4 geantwortet?
-table(clean_data$PolitikNational)
-table(df_1$PolitikNational)
-
-clean_data <- clean_data[!(clean_data$PolitikNational %in% c(4)), ]
-clean_data <- clean_data[!(clean_data$PolitikEuropa %in% c(4)), ]
-clean_data <- clean_data[!(clean_data$PolitikLokal %in% c(4)), ]
-
-#Erstellung Dummy-Variablen für nationale Politik
-clean_data$nationalhäufig <- NA #frequently
-clean_data$nationalhäufig <- ifelse(clean_data$PolitikNational == 1, 1, 0)
-
-clean_data$nationalgelegentlich <- NA #occasionally
-clean_data$nationalgelegentlich <- ifelse(clean_data$PolitikNational == 2, 1, 0)
-
-clean_data$nationalnie <- NA #frequently
-clean_data$nationalnie <- ifelse(clean_data$PolitikNational == 3, 1, 0)
-
-#Erstellung Dummy-Variable für Europa-Politik
-
-clean_data$europahäufig <- NA #frequently
-clean_data$europahäufig <- ifelse(clean_data$PolitikEuropa == 1, 1, 0)
-
-clean_data$europagelegentlich <- NA #occasionally
-clean_data$europagelegentlich <- ifelse(clean_data$PolitikEuropa == 2, 1, 0)
-
-clean_data$europanie <- NA #frequently
-clean_data$europanie <- ifelse(clean_data$PolitikEuropa == 3, 1, 0)
-
-#Erstellung Dummy-Variable für lokale Politik
-
-clean_data$lokalhäufig <- NA #frequently
-clean_data$lokalhäufig <- ifelse(clean_data$PolitikLokal == 1, 1, 0)
-
-clean_data$lokalgelegentlich <- NA #frequently
-clean_data$lokalgelegentlich <- ifelse(clean_data$PolitikLokal == 2, 1, 0)
-
-clean_data$lokalnie <- NA #frequently
-clean_data$lokalnie <- ifelse(clean_data$PolitikLokal == 3, 1, 0)
 
 
 ##Ländernamen zum mergen 
