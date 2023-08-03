@@ -134,11 +134,11 @@ colnames(GDP2)[4] <- "Population"
 GDP2$Population <- NULL
 
 #Finalen Datensatz erstellen
-DatensatzGesamt <- merge(EuBaDaten, GDP2, by = "Entity")                   #Datensätze zusammenfügen
-DatensatzGesamt$Bildungsjahre <- NULL                                        # Bildungsjahre Alter
+DatensatzGesamt <- merge(EuBaDaten, GDP2, by = "Entity")                     #Datensätze zusammenfügen
+DatensatzGesamt$Bildungsjahre <- NULL                                        #Bildungsjahre Alter
 DatensatzGesamt$Geschlecht <- NULL                                           #Geschlecht alte Kodierung
 DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL #GDP unnötig
-colnames(DatensatzGesamt)[11] <- "GDPpcapita2009" #Umbenennung Spalte
+colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"                            #Umbenennung Spalte
 
 # Neue quadrierte BIPVariable hinzufügen
 DatensatzGesamt <- DatensatzGesamt %>% 
