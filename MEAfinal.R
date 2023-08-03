@@ -93,13 +93,13 @@ EuBaDaten$Entity[EuBaDaten$Land == 3] <- "Netherlands"
 EuBaDaten$Entity[EuBaDaten$Land == 4] <- "Germany"
 EuBaDaten$Entity[EuBaDaten$Land == 5] <- "Italy"
 EuBaDaten$Entity[EuBaDaten$Land == 6] <- "Luxembourg"
-EuBaDaten$Entity[EuBaDaten$Land == 7] <- "France"
+EuBaDaten$Entity[EuBaDaten$Land == 7] <- "Denmark"
 EuBaDaten$Entity[EuBaDaten$Land == 8] <- "Ireland"
 EuBaDaten$Entity[EuBaDaten$Land == 9] <- "United Kingdom"
 EuBaDaten$Entity[EuBaDaten$Land == 11] <- "Greece"
 EuBaDaten$Entity[EuBaDaten$Land == 12] <- "Spain"
 EuBaDaten$Entity[EuBaDaten$Land == 13] <- "Portugal"
-EuBaDaten$Entity[EuBaDaten$Land == 16] <- "Finnland"
+EuBaDaten$Entity[EuBaDaten$Land == 16] <- "Finland"
 EuBaDaten$Entity[EuBaDaten$Land == 17] <- "Sweden"
 EuBaDaten$Entity[EuBaDaten$Land == 18] <- "Austria"
 EuBaDaten$Entity[EuBaDaten$Land == 19] <- "Cyprus"
@@ -114,12 +114,13 @@ EuBaDaten$Entity[EuBaDaten$Land == 27] <- "Slovakia"
 EuBaDaten$Entity[EuBaDaten$Land == 28] <- "Slovenia"
 EuBaDaten$Entity[EuBaDaten$Land == 29] <- "Bulgaria"
 EuBaDaten$Entity[EuBaDaten$Land == 30] <- "Romania"
+EuBaDaten$Entity[EuBaDaten$Land == 32] <- "Croatia"
 
 ##############################GDP logaritmiert in die MEA aufnehmen?????????? Quadriert plus normal?????
 ##GDP Datensatz   
 GDP <- filter(gdp, Year == 2009)  #2009 rausfiltern 
 #Länder filtern
-eu_laender <- c("Austria", "Belgium", "Bulgaria", "Cyprus", "Czech Republic",
+eu_laender <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic",
                 "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
                 "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
                 "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "United Kingdom")
@@ -145,6 +146,15 @@ DatensatzGesamt <- DatensatzGesamt %>%
   mutate(bip_squared = GDPpcapita2009^2)  ##quadriertes BIP nicht signifikant, daher mit normalem weitergerechnet!
 
 
+EUeintritt_table <- data.frame(
+   Land = eu_laender,  # Ländernamen in der gleichen Reihenfolge wie in deinem Datensatz
+   Mitgliedsdauer = c(1995, 1958, 2007, 2013, 2004, 2004, 1973, 2004, 1995, 1958, 1958, 1981, 2004, 1973, 1958, 2004, 2004, 1958, 2004, 1958, 2004, 1986, 2007, 2004, 2004, 1986, 1995, 1973))
+ 
+
+DatensatzGesamt$Eintritt_in_EU <- EUeintritt_table$Mitgliedsdauer[match(DatensatzGesamt$Entity, EUeintritt_table$Land)]  
+   
+DatensatzGesamt$Mitgliedsdauer <- 2010 - DatensatzGesamt$Eintritt_in_EU
+   
 ###Mehrebenenanalyse
 
 #Preliminary phase: Preparing the data (centering variables)
