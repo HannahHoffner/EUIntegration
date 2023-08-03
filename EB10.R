@@ -19,7 +19,9 @@ library(ggplot2)
 
 #### Datensatz Eurobarometer einlesen ####
 
-EB10 <- read_sav("ZA5234_v2-0-1.sav")
+#EB10 <- read_sav("ZA5234_v2-0-1.sav")
+
+EB10 <- read_sav("DatensatzUKundGERmerge.sav")
 
 
 
@@ -30,6 +32,9 @@ EB10 <- read_sav("ZA5234_v2-0-1.sav")
 df_1 <- select(EB10,
                v6, 
                v40,
+               v92,
+               v93,
+               v94,
                v206, 
                v553,
                v554,
@@ -43,6 +48,9 @@ df_1 <- select(EB10,
 df_1 <- select(df_1,
                Land = v6, 
                LandGewichtung = v40,
+               PolitikNational = v92,
+               PolitikEuropa = v93,
+               PolitikLokal = v94,
                Zustimmung_EU = v206, 
                BJ_original = v553,
                BJ_recoded = v554,
@@ -133,11 +141,8 @@ table(clean_data$BJ_gruppiert)
 
 
 
-
-table(clean_data$Land)
-
 ##Ländernamen zum mergen 
-
+table(clean_data$Land)
 
 clean_data$Entity <- NA
 
