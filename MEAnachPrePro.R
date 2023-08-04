@@ -13,3 +13,9 @@ library(dplyr)      #BIP quadrieren
 library(ordinal)    #3-geteilte AV MEA
 
 DataMEA <- read_sav("DatenMEA.sav")
+
+#Daten zentrieren, skalieren?
+#Nullmodelle
+#2 und 3 Einstellung testen
+#BIP auch quadriert
+#MEA
