@@ -158,12 +158,28 @@ DatensatzGesamt$Mitgliedsdauer <- 2010 - DatensatzGesamt$Eintritt_in_EU
 
 
 write_sav(DatensatzGesamt, "DatenMEA.sav")
+
+##########################################################################ab hier durchführen reicht
 ###Mehrebenenanalyse
 
+library(haven)
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(ggplot2)    #Diagramme
+library(lme4)       #Mehrebenenanlyse
+library(misty)      #Zentrierung
+library(stargazer)  #Output
+library(performance)#ICC
+library(dplyr)      #BIP quadrieren
+library(ordinal)    #3-geteilte AV MEA
+
+DatensatzGesamt <- read_sav("DatenMEA.sav")
 #Preliminary phase: Preparing the data (centering variables)
 #Step #1: Building an empty model, so as to assess the variation of the log-odds from one cluster to another
 #Step #2: Building an intermediate model, so as to assess the variation of the lower-level effect(s) from one cluster to another
 #Step #3: Building a final model, so as to test the hypothesis(/-es)
+
 
 #Preliminary phase
 ###Daten zentrieren:
@@ -235,14 +251,14 @@ icc_mit_PaketM03b
 # Below are the commands to run the constrained intermediate model (CIM); 
 # the model contains all level-1 variables, all level-2 variables well as all intra-level interactions).
 
-CIM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 | Entity),
+CIM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + Mitgliedsdauer + (1 | Entity),
              data = DatensatzGesamt,
              family = "binomial",
              weights = Gewichtung_Land)
 summary(CIM)
 
 #mit gruppeninterner Zentrierung
-CIM_cmc <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + (1 | Entity),
+CIM_cmc <- glmer(EinstellungDichotom ~ BJ_gruppiert_centered + Alter_gruppiert + Geschlecht_recoded + GDPpcapita2009 + Mitgliedsdauer + (1 | Entity),
                  data = DatensatzGesamt,
                  family = "binomial",
                  weights = Gewichtung_Land)
@@ -284,6 +300,7 @@ FM <- glmer(EinstellungDichotom ~ BJ_gruppiert_centeredGrandMean
             + Alter_gruppiert 
             + Geschlecht_recoded 
             + GDPpcapita2009 
+            + Mitgliedsdauer
             + BJ_gruppiert_centeredGrandMean:GDPpcapita2009
             + (1 + BJ_gruppiert_centeredGrandMean || Entity),
             data = DatensatzGesamt,
@@ -343,6 +360,7 @@ modelsummary(M0)
 DatensatzGesamt$BJsc <- scale(DatensatzGesamt$BJ_gruppiert_centered)
 DatensatzGesamt$Altsc <- scale(DatensatzGesamt$Alter_gruppiert)
 DatensatzGesamt$GDPsc <- scale(DatensatzGesamt$GDPpcapita2009)
+DatensatzGesamt$MitDausc <- scale(DatensatzGesamt$Mitgliedsdauer)
 
 #Nullmodell(bleibt gleich)
 M0 <- glmer(EinstellungDichotom ~ ( 1 | Entity),
@@ -358,7 +376,9 @@ iccM0
 fixedslope <- glmer(EinstellungDichotom ~ BJsc 
                     + Altsc 
                     + Geschlecht_recoded 
-                    + GDPsc + (1 | Entity),
+                    + GDPsc 
+                    + MitDausc
+                    + (1 | Entity),
                     data = DatensatzGesamt,
                     family = "binomial",
                     weights = Gewichtung_Land)
@@ -368,7 +388,8 @@ summary(fixedslope)
 randomslope <- glmer(EinstellungDichotom ~ BJsc 
                      + Altsc 
                      + Geschlecht_recoded 
-                     + GDPsc 
+                     + GDPsc
+                     + MitDausc
                      + (1 + BJsc + Geschlecht_recoded + Altsc|| Entity),
                      data = DatensatzGesamt,
                      family = "binomial",
