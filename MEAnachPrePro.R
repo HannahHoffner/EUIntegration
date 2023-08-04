@@ -12,4 +12,4 @@ library(performance)#ICC
 library(dplyr)      #BIP quadrieren
 library(ordinal)    #3-geteilte AV MEA
 
-DatensatzGesamt <- read_sav("DatenMEA.sav")
+DataMEA <- read_sav("DatenMEA.sav")
