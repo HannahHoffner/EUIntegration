@@ -139,7 +139,7 @@ DatensatzGesamt <- merge(EuBaDaten, GDP2, by = "Entity")                     #Da
 DatensatzGesamt$Bildungsjahre <- NULL                                        #Bildungsjahre Alter
 DatensatzGesamt$Geschlecht <- NULL                                           #Geschlecht alte Kodierung
 DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL #GDP unnötig
-colnames(DatensatzGesamt)[11] <- "GDPpcapita2009"                            #Umbenennung Spalte
+colnames(DatensatzGesamt)[13] <- "GDPpcapita2009"                            #Umbenennung Spalte
 
 # Neue quadrierte BIPVariable hinzufügen
 DatensatzGesamt <- DatensatzGesamt %>% 
@@ -155,6 +155,9 @@ DatensatzGesamt$Eintritt_in_EU <- EUeintritt_table$Mitgliedsdauer[match(Datensat
    
 DatensatzGesamt$Mitgliedsdauer <- 2010 - DatensatzGesamt$Eintritt_in_EU
    
+
+
+write_sav(DatensatzGesamt, "DatenMEA.sav")
 ###Mehrebenenanalyse
 
 #Preliminary phase: Preparing the data (centering variables)
