@@ -80,6 +80,10 @@ EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert == 10] <- 3
 table(EuBaDaten$BJ_gruppiert)
 
 
+#Bildung 3geteilt ohne noch in Ausbildung !!!!!!!!!!!!!
+#EuBaDaten$BildKat3 <- EuBaDaten$BJ_gruppiert
+#EuBaDaten$BildKat3
+
 #Bildung gruppiert neu kodiert: falsch, weil ordinal angenommen & noch in Studium als höchstes angenommen
 EuBaDaten$Bildungsjahre_recoded <- EuBaDaten$Bildungsjahre_kategorisiert     # Umkodierung der Antwortkategorien
 EuBaDaten <- EuBaDaten[!(EuBaDaten$Bildungsjahre_recoded %in% c(97, 98)), ]# Löschen der Fälle mit den Antworten 97 und 98
