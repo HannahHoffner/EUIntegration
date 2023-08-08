@@ -54,8 +54,8 @@ EuBaDaten <- EuBaDaten[!EuBaDaten$Einstellung_EU %in% c(4, 9), ]         # Lösc
 EuBaDaten$Einstellung3 <- NA
 ## Umkodierung und Zuordnung 
 EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 3] <- 1 #wedernoch
-EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 1] <- 0 #good
-EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 2] <- 2 #bad
+EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 1] <- 2 #good
+EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 2] <- 0 #bad
 ## Überprüfung der neuen Variable
 table(EuBaDaten$Einstellung3)
 
