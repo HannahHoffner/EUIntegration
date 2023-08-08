@@ -59,4 +59,10 @@ ranef(Leermodell3)
 #BIP auch quadriert
 #MEA
 
-
+#Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
+#am Gesamtmittelwert:
+#alle intervallskalierten Prädiktoren auf Individualebene
+DataMEA$BJ_gruppiert_cGM <- center(DataMEA$BJ_gruppiert, type = "CGM")
+DataMEA$Alter_gruppiert_cGM <- center(DataMEA$Alter_gruppiert, type = "CGM")
+DataMEA$Alter_gruppiert_cGM <- center(DataMEA$Alter_gruppiert, type = "CGM")
+#DataMEA$Mitgliedsdauer_cGM <- center(DataMEA$Mitgliedsdauer, type = "CGM")

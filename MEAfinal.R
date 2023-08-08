@@ -75,7 +75,7 @@ EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert >= 3 & EuBaDaten$Bi
 # Umkodierung über 20 BJ zu 2
 EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert >= 7 & EuBaDaten$Bildungsjahre_kategorisiert <= 9] <- 2 
 #Umkodierung noch im Bildungssystem zu 4
-EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert == 10] <- 4
+EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert == 10] <- 3
 # Überprüfung der neuen Variable
 table(EuBaDaten$BJ_gruppiert)
 
