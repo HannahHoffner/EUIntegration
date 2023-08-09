@@ -107,7 +107,7 @@ EuBaDaten$Entity[EuBaDaten$Land == 16] <- "Finland"
 EuBaDaten$Entity[EuBaDaten$Land == 17] <- "Sweden"
 EuBaDaten$Entity[EuBaDaten$Land == 18] <- "Austria"
 EuBaDaten$Entity[EuBaDaten$Land == 19] <- "Cyprus"
-EuBaDaten$Entity[EuBaDaten$Land == 20] <- "Czech Republic"
+EuBaDaten$Entity[EuBaDaten$Land == 20] <- "Czechia"
 EuBaDaten$Entity[EuBaDaten$Land == 21] <- "Estonia"
 EuBaDaten$Entity[EuBaDaten$Land == 22] <- "Hungary"
 EuBaDaten$Entity[EuBaDaten$Land == 23] <- "Latvia"
@@ -124,7 +124,7 @@ EuBaDaten$Entity[EuBaDaten$Land == 32] <- "Croatia"
 ##GDP Datensatz   
 GDP <- filter(gdp, Year == 2009)  #2009 rausfiltern 
 #Länder filtern
-eu_laender <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic",
+eu_laender <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czechia",
                 "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
                 "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland",
                 "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden", "United Kingdom")

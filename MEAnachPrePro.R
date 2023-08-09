@@ -16,6 +16,7 @@ library(sjPlot)     #Random Effects plotten
 
 DataMEA <- read_sav("DatenMEA.sav")
 
+
 #Daten zentrieren, skalieren?
 #Nullmodelle
 
@@ -119,11 +120,14 @@ summary(random_slope_modell)
 correlation_matrix <- cor(DataMEA[, c("BJ_gruppiert_cGM", "Alter_gruppiert_cGM", "Geschlecht_recoded", "GDPpcapita2009_cGM", "Mitgliedsdauer_cGM")])
 print(correlation_matrix)
 
-install.packages("corrplot")
-library(corrplot)
 
-colnames <- c("Bildungsjahre", "Alter", "Geschlecht", "GDP", "Mitgliedsdauer")  # Neue Beschriftungen für die Spalten
-row.names <- c("Bildungsjahre", "Alter", "Geschlecht", "GDP", "Mitgliedsdauer")  # Neue Beschriftungen für die Zeilen
 
-corrplot(correlation_matrix, method = "circle", colnames = colnames, row.names = row.names)
+#Crosslevel-Interaktionen überprüfen:
+crosslevel <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM + Alter_gruppiert_cGM + 
+                  Geschlecht_recoded + GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
+                  BJ_gruppiert_cGM:GDPpcapita2009_cGM + (1 | Entity), 
+                  family = "binomial", data = DataMEA)
+summary(crosslevel)
 
+anzahl_entity_auspragungen <- length(unique(DataMEA$Entity))
+print(anzahl_entity_auspragungen)
