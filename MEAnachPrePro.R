@@ -54,7 +54,7 @@ fixef(Leermodell3)
 ranef(Leermodell3)
 
 #Bildungsgruppen nur 3geteilt:
-DataMEA$BildKat3 <-
+#DataMEA$BildKat3 <-
 
 
 #2 und 3 Einstellung testen
@@ -62,11 +62,10 @@ DataMEA$BildKat3 <-
 #MEA
 
 #Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
-#am Gesamtmittelwert:
 #alle intervallskalierten Prädiktoren auf Individualebene
 DataMEA$BJ_gruppiert_cGM <- center(DataMEA$BJ_gruppiert, type = "CGM")
 DataMEA$Alter_gruppiert_cGM <- center(DataMEA$Alter_gruppiert, type = "CGM")
-#DataMEA$Mitgliedsdauer_cGM <- center(DataMEA$Mitgliedsdauer, type = "CGM")
+#nicht bei dichotomen Variablen nötig! (Durchschnittsperson = Frau, durchschnittliches Alter, durchschnittliche Bildungsgruppe)
 
 
 #Random Intercept-Modell mit Variablen der Individualebene:
@@ -80,8 +79,17 @@ summary(RIM2)
 RSM2 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
               (1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded | Entity), 
               data = DataMEA, 
-              family = binomial)
+              family = "binomial")
 summary(RSM2) #hier vllt nur random slope für BJ, nicht alter und geschlecht??? --> vergleichen, was bessere Ergebnisse liefert
+
+
+#Random Slope-Modell mit Variablen der Individualebene aber nur Random Slope für BJ
+RSM22 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
+                (1 + BJ_gruppiert_cGM | Entity), 
+              data = DataMEA, 
+              family = "binomial")
+summary(RSM22) #schlechter als random slope auf allen Variablen
+
 
 #Vergleich:
 anova(RIM2, RSM2) 
@@ -89,13 +97,33 @@ anova(RIM2, RSM2)
 #RIM2    5 31473 31513 -15731    31463          
 #RSM2   14 31381 31495 -15677    31353 109.08  9
 
+anova(RSM2, RSM22)
+
+#Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
+#alle intervallskalierten Prädiktoren auf Kontextebene
+DataMEA$Mitgliedsdauer_cGM <- center(DataMEA$Mitgliedsdauer, type = "CGM")
+DataMEA$GDPpcapita2009_cGM <- center(DataMEA$GDPpcapita2009, type = "CGM")
+DataMEA$bip_squared_cGM <- center(DataMEA$bip_squared, type = "CGM")
+
 # Modell mit Random Slopes auf Individual- und Kontextebene
 random_slope_modell <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
-                               GDPpcapita2009 + bip_squared + Mitgliedsdauer + 
+                               GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
                                (1 + Alter_gruppiert_cGM + Geschlecht_recoded | Entity) + 
-                               (1 + GDPpcapita2009 + bip_squared + Mitgliedsdauer | Entity), 
-                             data = DataMEA, family = binomial)
+                               (1 + GDPpcapita2009_cGM + Mitgliedsdauer_cGM | Entity), 
+                             data = DataMEA, family = "binomial")
 
 # Modell fitting und Zusammenfassung
 summary(random_slope_modell)
+
+#Korrelationen überprüfen:
+correlation_matrix <- cor(DataMEA[, c("BJ_gruppiert_cGM", "Alter_gruppiert_cGM", "Geschlecht_recoded", "GDPpcapita2009_cGM", "Mitgliedsdauer_cGM")])
+print(correlation_matrix)
+
+install.packages("corrplot")
+library(corrplot)
+
+colnames <- c("Bildungsjahre", "Alter", "Geschlecht", "GDP", "Mitgliedsdauer")  # Neue Beschriftungen für die Spalten
+row.names <- c("Bildungsjahre", "Alter", "Geschlecht", "GDP", "Mitgliedsdauer")  # Neue Beschriftungen für die Zeilen
+
+corrplot(correlation_matrix, method = "circle", colnames = colnames, row.names = row.names)
 
