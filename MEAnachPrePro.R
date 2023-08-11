@@ -237,6 +237,7 @@ DataMEA_filtered <- DataMEA %>%
 #Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
 #alle intervallskalierten Prädiktoren auf Individualebene
 DataMEA$BJ_gruppiert_cGM <- center(DataMEA$BJ_gruppiert, type = "CGM")
+DataMEA$BJ3_cGM <- center(DataMEA$BJ3, type = "CGM")
 DataMEA$Alter_gruppiert_cGM <- center(DataMEA$Alter_gruppiert, type = "CGM")
 #nicht bei dichotomen Variablen nötig! (Durchschnittsperson = Frau, durchschnittliches Alter, durchschnittliche Bildungsgruppe)
 
@@ -252,6 +253,13 @@ RIM2 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM +
 summary(RIM2)
 
 #Random Intercept-Modell mit Variablen der Individualebene: Einstellung 2, Bildung 3
+RIM2BJ3 <- glmer(EinstellungDichotom ~ 1 + BJ3_cGM + Alter_gruppiert_cGM + Geschlecht_recoded+ (1 | Entity), 
+              data = DataMEA,
+              family = "binomial",
+)
+summary(RIM2BJ3)
+
+#Random Intercept-Modell mit Variablen der Individualebene: Einstellung 2, Bildung 3 (ohne noch in ausbildung)
 RIM2BJ <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded+ (1 | Entity), 
               data = DataMEA_filtered,
               family = "binomial",
@@ -293,7 +301,15 @@ anova(RIM2, RSM2)
 #RIM2    5 31473 31513 -15731    31463          
 #RSM2   14 31381 31495 -15677    31353 109.08  9
 
+anova(RIM2, RIM2BJ3)
+#        npar   AIC   BIC logLik deviance  Chisq Df Pr(>Chisq)
+#RIM2       5 32657 32697 -16323    32647                     
+#RIM2BJ3    5 32649 32690 -16320    32639 7.7014  0
+
 anova(RSM2, RSM22)
+#      npar   AIC   BIC logLik deviance  Chisq Df Pr(>Chisq)    
+#RSM22    7 32636 32693 -16311    32622                         
+#RSM2    14 32558 32672 -16265    32530 91.989  7  < 2.2e-16 ***
 
 anova(RIM2BJ, RSM2BJ)
 #       npar   AIC   BIC logLik deviance  Chisq Df Pr(>Chisq)    
