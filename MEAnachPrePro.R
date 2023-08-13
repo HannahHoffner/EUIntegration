@@ -81,14 +81,10 @@ table(EuBaDaten$BJ_gruppiert)
 
 
 #Bildung 3geteilt: noch in Studium auch Gruppe tertiäre Bildung
-DataMEA$BJ3 <- DataMEA$BJ_gruppiert
+EuBaDaten$BJ3 <- EuBaDaten$BJ_gruppiert
 # Ersetze alle Werte 3 in BJ3 durch den Wert 2
-DataMEA$BJ3[DataMEA$BJ_gruppiert == 3] <- 2
+EuBaDaten$BJ3[EuBaDaten$BJ_gruppiert == 3] <- 2
 
-#Bildung gruppiert neu kodiert: falsch, weil ordinal angenommen & noch in Studium als höchstes angenommen
-EuBaDaten$Bildungsjahre_recoded <- EuBaDaten$Bildungsjahre_kategorisiert     # Umkodierung der Antwortkategorien
-EuBaDaten <- EuBaDaten[!(EuBaDaten$Bildungsjahre_recoded %in% c(97, 98)), ]# Löschen der Fälle mit den Antworten 97 und 98
-EuBaDaten$Bildungsjahre_recoded[EuBaDaten$Bildungsjahre_recoded == 11] <- 0  # Umkodierung der Antwortkategorie 11 (no full time) zu 0
 
 ###Ländernamen zum mergen
 EuBaDaten$Entity <- NA
@@ -157,7 +153,7 @@ DatensatzGesamt$Eintritt_in_EU <- EUeintritt_table$Mitgliedsdauer[match(Datensat
 
 #2010 minus Eintritt = Mitgliedsdauer
 DatensatzGesamt$Mitgliedsdauer <- 2010 - DatensatzGesamt$Eintritt_in_EU
-write_sav(DatensatzGesamt, "DatenMEA.sav")
+write_sav(DatensatzGesamt, "DatenMEA2.sav")
 
 #-----------------Mehrebenenanalyse -------------------------------------------------------
 

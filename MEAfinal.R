@@ -84,10 +84,10 @@ table(EuBaDaten$BJ_gruppiert)
 #EuBaDaten$BildKat3 <- EuBaDaten$BJ_gruppiert
 #EuBaDaten$BildKat3
 
-#Bildung gruppiert neu kodiert: falsch, weil ordinal angenommen & noch in Studium als höchstes angenommen
+#Bildung gruppiert neu kodiert: falsch, weil ordinal angenommen & noch in Studium als höchstes angenommen (mit in höchste Gruppe jetzt)
 EuBaDaten$Bildungsjahre_recoded <- EuBaDaten$Bildungsjahre_kategorisiert     # Umkodierung der Antwortkategorien
 EuBaDaten <- EuBaDaten[!(EuBaDaten$Bildungsjahre_recoded %in% c(97, 98)), ]# Löschen der Fälle mit den Antworten 97 und 98
-EuBaDaten$Bildungsjahre_recoded[EuBaDaten$Bildungsjahre_recoded == 11] <- 0  # Umkodierung der Antwortkategorie 11 (no full time) zu 0
+EuBaDaten$Bildungsjahre_recoded[EuBaDaten$Bildungsjahre_recoded == 10] <- 2  # Umkodierung der Antwortkategorie 10 (noch in Ausbildung) zu 2
 
 ###Ländernamen zum mergen
 EuBaDaten$Entity <- NA
