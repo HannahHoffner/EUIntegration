@@ -171,7 +171,7 @@ library(ordinal)    #3-geteilte AV MEA
 library(texreg)     #Tabelle html/latex
 library(sjPlot)     #Random Effects plotten
 
-DataMEA <- read_sav("DatenMEA.sav")
+DataMEA <- read_sav("DatenMEA2.sav")
 
 
 #Daten zentrieren, skalieren?
