@@ -100,15 +100,15 @@ table(EuBaDaten$BJ_gruppiert)
 
 
 #Umwandlung as.factor
-EuBaDaten$BJ_gruppiert <- as.factor(EuBaDaten$BJ_gruppiert)
-EuBaDaten$Einstellung3 <- as.factor(EuBaDaten$Einstellung3)
+#EuBaDaten$BJ_gruppiert <- as.factor(EuBaDaten$BJ_gruppiert)
+EuBaDaten$EinstellungDichotom <- as.factor(EuBaDaten$EinstellungDichotom)
 EuBaDaten$Geschlecht_recoded <- as.factor(EuBaDaten$Geschlecht_recoded)
-EuBaDaten$Alter_gruppiert <- as.factor(EuBaDaten$Alter_gruppiert)
+#EuBaDaten$Alter_gruppiert <- as.factor(EuBaDaten$Alter_gruppiert)
 
 
 # Überprüfung des Typs der umgewandelten Spalte
 print(paste("BJ_gruppiert ist vom Typ:", class(EuBaDaten$BJ_gruppiert)))
-print(paste("Einstellung 3 ist vom Typ:", class(EuBaDaten$Einstellung3)))
+print(paste("Einstellung Dichotom ist vom Typ:", class(EuBaDaten$EinstellungDichotom)))
 print(paste("Geschlecht_recoded ist vom Typ:", class(EuBaDaten$Geschlecht_recoded)))
 print(paste("Alter ist vom Typ:", class(EuBaDaten$Alter_gruppiert)))
 
@@ -251,43 +251,18 @@ icc(Leermodell3)
 fixef(Leermodell3)
 ranef(Leermodell3)
 
-#Bildungsgruppen nur 3geteilt:
-# ohne "Noch in Bildung --> Bildung ordinal mit 0,1,2 also dreigeteilte Variable
-DataMEA_filtered <- DataMEA %>%
-  filter(BJ_gruppiert != 3)  # Ausschluss der Fälle mit Wert 3
-
 #Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
 #alle intervallskalierten Prädiktoren auf Individualebene
 DataMEA$BJ_gruppiert_cGM <- center(DataMEA$BJ_gruppiert, type = "CGM")
-DataMEA$BJ3_cGM <- center(DataMEA$BJ3, type = "CGM")
 DataMEA$Alter_gruppiert_cGM <- center(DataMEA$Alter_gruppiert, type = "CGM")
 #nicht bei dichotomen Variablen nötig! (Durchschnittsperson = Frau, durchschnittliches Alter, durchschnittliche Bildungsgruppe)
 
-#auch in DataMEA_filtered
-DataMEA_filtered$BJ_gruppiert_cGM <- center(DataMEA_filtered$BJ_gruppiert, type = "CGM")
-DataMEA_filtered$Alter_gruppiert_cGM <- center(DataMEA_filtered$Alter_gruppiert, type = "CGM")
-
-#Random Intercept-Modell mit Variablen der Individualebene: Einstellung 2, Bildung 4
+#Random Intercept-Modell mit Variablen der Individualebene: Einstellung 2, Bildung 3
 RIM2 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded+ (1 | Entity), 
              data = DataMEA,
              family = "binomial",
              )
 summary(RIM2)
-
-#Random Intercept-Modell mit Variablen der Individualebene: Einstellung 2, Bildung 3
-RIM2BJ3 <- glmer(EinstellungDichotom ~ 1 + BJ3_cGM + Alter_gruppiert_cGM + Geschlecht_recoded+ (1 | Entity), 
-              data = DataMEA,
-              family = "binomial",
-)
-summary(RIM2BJ3)
-
-#Random Intercept-Modell mit Variablen der Individualebene: Einstellung 2, Bildung 3 (ohne noch in ausbildung)
-RIM2BJ <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded+ (1 | Entity), 
-              data = DataMEA_filtered,
-              family = "binomial",
-)
-summary(RIM2BJ)
-
 
 #Random Slope-Modell mit Variablen der Individualebene
 RSM2 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
@@ -296,26 +271,12 @@ RSM2 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM +
               family = "binomial")
 summary(RSM2) #hier vllt nur random slope für BJ, nicht alter und geschlecht??? --> vergleichen, was bessere Ergebnisse liefert
 
-#Random Slope-Modell mit Variablen der Individualebene BJ 3
-RSM2BJ <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
-                (1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded | Entity), 
-              data = DataMEA_filtered, 
-              family = "binomial")
-summary(RSM2BJ)
-
 #Random Slope-Modell mit Variablen der Individualebene aber nur Random Slope für BJ
 RSM22 <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
                 (1 + BJ_gruppiert_cGM | Entity), 
               data = DataMEA, 
               family = "binomial")
 summary(RSM22) #schlechter als random slope auf allen Variablen
-
-#Random Slope-Modell mit Variablen der Individualebene aber nur Random Slope für BJ 3
-RSM22BJ <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
-                 (1 + BJ_gruppiert_cGM | Entity), 
-               data = DataMEA_filtered, 
-               family = "binomial")
-summary(RSM22BJ) 
 
 #Vergleich:
 anova(RIM2, RSM2) 
