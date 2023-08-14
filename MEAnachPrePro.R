@@ -74,7 +74,7 @@ EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert == 11] <- 0 #nofull
 EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert >= 3 & EuBaDaten$Bildungsjahre_kategorisiert <= 6] <- 1 
 # Umkodierung über 20 BJ zu 2
 EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert >= 7 & EuBaDaten$Bildungsjahre_kategorisiert <= 9] <- 2 
-#Umkodierung noch im Bildungssystem zu 4
+#Umkodierung noch im Bildungssystem zu 3
 EuBaDaten$BJ_gruppiert[EuBaDaten$Bildungsjahre_kategorisiert == 10] <- 3
 # Überprüfung der neuen Variable
 table(EuBaDaten$BJ_gruppiert)
@@ -85,6 +85,32 @@ EuBaDaten$BJ3 <- EuBaDaten$BJ_gruppiert
 # Ersetze alle Werte 3 in BJ3 durch den Wert 2
 EuBaDaten$BJ3[EuBaDaten$BJ_gruppiert == 3] <- 2
 
+#Still Studying in andere einsortieren
+umwandlung_bildung <- function (BJ_gruppiert, Alter){
+  ifelse(BJ_gruppiert == 3,
+         ifelse(Alter >=20, 2,
+                ifelse (Alter >=16, 1, 0)
+                ),
+         ifelse(BJ_gruppiert == 3, 0, BJ_gruppiert))
+}
+
+EuBaDaten <- EuBaDaten %>%
+  mutate (BJ_gruppiert = umwandlung_bildung(BJ_gruppiert, Alter))
+table(EuBaDaten$BJ_gruppiert)
+
+
+#Umwandlung as.factor
+EuBaDaten$BJ_gruppiert <- as.factor(EuBaDaten$BJ_gruppiert)
+EuBaDaten$Einstellung3 <- as.factor(EuBaDaten$Einstellung3)
+EuBaDaten$Geschlecht_recoded <- as.factor(EuBaDaten$Geschlecht_recoded)
+EuBaDaten$Alter_gruppiert <- as.factor(EuBaDaten$Alter_gruppiert)
+
+
+# Überprüfung des Typs der umgewandelten Spalte
+print(paste("BJ_gruppiert ist vom Typ:", class(EuBaDaten$BJ_gruppiert)))
+print(paste("Einstellung 3 ist vom Typ:", class(EuBaDaten$Einstellung3)))
+print(paste("Geschlecht_recoded ist vom Typ:", class(EuBaDaten$Geschlecht_recoded)))
+print(paste("Alter ist vom Typ:", class(EuBaDaten$Alter_gruppiert)))
 
 ###Ländernamen zum mergen
 EuBaDaten$Entity <- NA
