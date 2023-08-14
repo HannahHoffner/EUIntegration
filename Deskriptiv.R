@@ -6,6 +6,8 @@ library(ggplot2)
 library(gridExtra)
 library(ggrepel)
 
+
+
 #### Deskriptive Statistik ####
 
 #### TO DO ####
@@ -239,6 +241,33 @@ GDPLand <- unique(df_final[, c("Entity", "GDPpcapita2009")])
 
 GDPLand
 
+
+#GDPin GDP2 umbenennen
+spaltennamen <- colnames(GDP2)
+
+# Neuen Namen für die 2. Spalte festlegen
+spaltennamen[2] <- "GDPpc"
+
+# Spaltennamen im Datensatz aktualisieren
+colnames(GDP2) <- spaltennamen
+
+GDP2$GDPpc <- round(GDP2$GDPpc)
+
+
+plot(GDP2$GDPpc, GDP2$Entity)
+
+library(ggplot2)
+
+ggplot(data = GDP2, aes(x = Entity, y = GDPpc)) +
+  geom_point() +
+  labs(x = "Entity", y = "GDP per Capita")
+
+GDP2_sorted <- GDP2[order(GDP2$GDPpc), ]
+
+ggplot(data = GDP2_sorted, aes(x = reorder(Entity, GDPpc), y = GDPpc)) +
+  geom_point() +
+  labs(x = "Entity", y = "GDP per Capita")
+
 #### GDP und Zustimmung ####
 
 #install.packages("ggrepel")
@@ -269,12 +298,14 @@ ggplot(df_gdp,
            )
        ) +
   geom_point(size = 4, color = "darkblue", alpha = 0.8) +
-  geom_text(hjust = 0, vjust = 0, color = "black", fontface = "bold")+
+  geom_text(hjust = 0, vjust = 0, color = "black", fontface = "bold", size = 2.65)+
   labs(x = "BIP pro Kopf 2009 (in $)",
-       y = "Einstellung zur EU (nach Mittelwerten)",
+       y = "Einstellung zur EU (nach Ländermittelwerten)",
        title = "Einstellung zur EU nach BIP pro Kopf 2009")+
   theme_minimal()
 
+
+#braucht ewig
 ggplot(df_gdp, 
        aes(x = GDPpcapita2009,
            y = MWEinstellung, 
