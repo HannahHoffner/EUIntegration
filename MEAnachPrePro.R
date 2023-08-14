@@ -81,9 +81,9 @@ table(EuBaDaten$BJ_gruppiert)
 
 
 #Bildung 3geteilt: noch in Studium auch Gruppe tertiäre Bildung
-EuBaDaten$BJ3 <- EuBaDaten$BJ_gruppiert
+#EuBaDaten$BJ3 <- EuBaDaten$BJ_gruppiert
 # Ersetze alle Werte 3 in BJ3 durch den Wert 2
-EuBaDaten$BJ3[EuBaDaten$BJ_gruppiert == 3] <- 2
+#EuBaDaten$BJ3[EuBaDaten$BJ_gruppiert == 3] <- 2
 
 #Still Studying in andere einsortieren
 umwandlung_bildung <- function (BJ_gruppiert, Alter){
@@ -165,7 +165,7 @@ DatensatzGesamt <- merge(EuBaDaten, GDP2, by = "Entity")                     #Da
 DatensatzGesamt$Bildungsjahre <- NULL                                        #Bildungsjahre Alter
 DatensatzGesamt$Geschlecht <- NULL                                           #Geschlecht alte Kodierung
 DatensatzGesamt$`GDP per capita (output, multiple price benchmarks)` <- NULL #GDP unnötig
-colnames(DatensatzGesamt)[13] <- "GDPpcapita2009"                            #Umbenennung Spalte
+colnames(DatensatzGesamt)[12] <- "GDPpcapita2009"                            #Umbenennung Spalte
 
 # Neue quadrierte BIPVariable hinzufügen
 DatensatzGesamt <- DatensatzGesamt %>% 
