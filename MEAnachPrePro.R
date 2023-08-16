@@ -40,6 +40,9 @@ EuBaDaten$Geschlecht_recoded <- NA
 EuBaDaten$Geschlecht_recoded [EuBaDaten$Geschlecht == 1] <- 1 #male
 EuBaDaten$Geschlecht_recoded [EuBaDaten$Geschlecht == 2] <- 0 #female
 
+EuBaDaten$Geschlecht_recoded <- ifelse(EuBaDaten$Geschlecht_recoded == 0, "Frau", "Mann")
+EuBaDaten$Geschlecht_recoded <- as.factor(EuBaDaten$Geschlecht_recoded)
+
 #Einstellung zur EU recoden (dichotomisieren: good=1, bad&neither good nor bad=0, dk=löschen
 EuBaDaten$EinstellungDichotom <- NA
 
@@ -48,6 +51,11 @@ EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU == 1] <- 1          #gut
 EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU %in% c(2, 3)] <- 0  #schlecht, weder noch
 EuBaDaten <- EuBaDaten[!EuBaDaten$Einstellung_EU %in% c(4, 9), ]         # Löschen der Fälle mit den Antworten 4 (dont know) und 9(inap)
 
+# Umcodieren von 0 auf Ablehnung und 1 auf Zustimmung in EinstellungDichotom
+EuBaDaten$EinstellungDichotom <- ifelse(EuBaDaten$EinstellungDichotom == 0, "contraEU", "proEU")
+
+# Jetzt wird die Spalte als Faktor umgewandelt
+EuBaDaten$EinstellungDichotom <- as.factor(EuBaDaten$EinstellungDichotom) #nicht nötig da oben kategorial koodiert
 
 ## Einstellung in 3 Kategorien 
 #neue Variable
@@ -97,13 +105,6 @@ umwandlung_bildung <- function (BJ_gruppiert, Alter){
 EuBaDaten <- EuBaDaten %>%
   mutate (BJ_gruppiert = umwandlung_bildung(BJ_gruppiert, Alter))
 table(EuBaDaten$BJ_gruppiert)
-
-
-#Umwandlung as.factor
-#EuBaDaten$BJ_gruppiert <- as.factor(EuBaDaten$BJ_gruppiert)
-EuBaDaten$EinstellungDichotom <- as.factor(EuBaDaten$EinstellungDichotom)
-EuBaDaten$Geschlecht_recoded <- as.factor(EuBaDaten$Geschlecht_recoded)
-#EuBaDaten$Alter_gruppiert <- as.factor(EuBaDaten$Alter_gruppiert)
 
 
 # Überprüfung des Typs der umgewandelten Spalte
@@ -200,10 +201,10 @@ library(sjPlot)     #Random Effects plotten
 DataMEA <- read_sav("DatenMEA2.sav")
 
 
-#Daten zentrieren, skalieren?
+
 #Nullmodelle
 
-####Leermodell auf DatensatzGesamt Einstellung 2-geteilt (ohne weights-Zusatz)
+####Leermodell auf DatensatzGesamt Einstellung 2-geteilt
 Leermodell2 <- glmer(EinstellungDichotom ~ 1 + ( 1 | Entity),
               data=DataMEA,
               family = "binomial",
@@ -294,15 +295,6 @@ anova(RSM2, RSM22)
 #RSM22    7 32636 32693 -16311    32622                         
 #RSM2    14 32558 32672 -16265    32530 91.989  7  < 2.2e-16 ***
 
-anova(RIM2BJ, RSM2BJ)
-#       npar   AIC   BIC logLik deviance  Chisq Df Pr(>Chisq)    
-#RIM2BJ    5 29925 29965 -14957    29915                         
-#RSM2BJ   14 29846 29959 -14909    29818 96.489  9  < 2.2e-16 ***
-
-anova(RSM2BJ, RSM22BJ)
-#        npar   AIC   BIC logLik deviance  Chisq Df Pr(>Chisq)    
-#RSM22BJ    7 29919 29975 -14952    29905                         
-#RSM2BJ    14 29846 29959 -14909    29818 86.252  7  7.266e-16 ***
 
 #--------------------Miteinbezug Kontextebene--------------------------------------
 #Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
@@ -311,74 +303,68 @@ DataMEA$Mitgliedsdauer_cGM <- center(DataMEA$Mitgliedsdauer, type = "CGM")
 DataMEA$GDPpcapita2009_cGM <- center(DataMEA$GDPpcapita2009, type = "CGM")
 DataMEA$bip_squared_cGM <- center(DataMEA$bip_squared, type = "CGM")
 
-#auch für BJ 3
-#Zentrierung am Gesamtmittelwert: cGM(centered Grand Mean)
-#alle intervallskalierten Prädiktoren auf Kontextebene
-DataMEA_filtered$Mitgliedsdauer_cGM <- center(DataMEA_filtered$Mitgliedsdauer, type = "CGM")
-DataMEA_filtered$GDPpcapita2009_cGM <- center(DataMEA_filtered$GDPpcapita2009, type = "CGM")
-DataMEA_filtered$bip_squared_cGM <- center(DataMEA_filtered$bip_squared, type = "CGM")
 
 fixed_slope_modell <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
                              GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
                              (BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded | Entity) + 
                              (GDPpcapita2009_cGM + Mitgliedsdauer_cGM | Entity), 
                            data = DataMEA, family = "binomial")
+# Modell fitting und Zusammenfassung
+summary(fixed_slope_modell)
 
 
-# Modell mit Random Slopes auf Individual- und Kontextebene
-random_slope_modell <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
-                               GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
-                               (1 + Alter_gruppiert_cGM + Geschlecht_recoded | Entity) + 
-                               (1 + GDPpcapita2009_cGM + Mitgliedsdauer_cGM | Entity), 
-                             data = DataMEA, family = "binomial")
+# Modell mit Random Slopes auf Individual- und Kontextebene (kann random slope nur auf individualebene geben)
+#random_slope_modell <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
+#                               GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
+#                               (1 + Alter_gruppiert_cGM + Geschlecht_recoded | Entity) + 
+#                               (1 + GDPpcapita2009_cGM + Mitgliedsdauer_cGM | Entity), 
+#                             data = DataMEA, family = "binomial")
 
 # Modell fitting und Zusammenfassung
-summary(fixed_modell)
+#summary(random_slope_modell)
 
-
-# Modell mit Random Slopes auf Individual- und Kontextebene
+# Modell mit Random Slopes auf Individualebene
 random_slope_modell <- glmer(EinstellungDichotom ~ 1 + BJ_gruppiert_cGM + Alter_gruppiert_cGM + Geschlecht_recoded + 
                                GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
-                               (1 + Alter_gruppiert_cGM + Geschlecht_recoded | Entity) + 
-                               (1 + GDPpcapita2009_cGM + Mitgliedsdauer_cGM | Entity), 
+                               (1 + Alter_gruppiert_cGM + Geschlecht_recoded | Entity),
                              data = DataMEA, family = "binomial")
 
 # Modell fitting und Zusammenfassung
 summary(random_slope_modell)
 
+
 #Korrelationen überprüfen:
 correlation_matrix <- cor(DataMEA[, c("BJ_gruppiert_cGM", "Alter_gruppiert_cGM", "Geschlecht_recoded", "GDPpcapita2009_cGM", "Mitgliedsdauer_cGM")])
 print(correlation_matrix)
 
-
-
 #Crosslevel-Interaktionen überprüfen:
-crosslevel <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM + Alter_gruppiert_cGM + 
-                  Geschlecht_recoded + GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
-                  BJ_gruppiert_cGM:GDPpcapita2009_cGM + (1 | Entity), 
-                  family = "binomial", data = DataMEA)
-summary(crosslevel)
+#crosslevel <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM + Alter_gruppiert_cGM + 
+ #                 Geschlecht_recoded + GDPpcapita2009_cGM + Mitgliedsdauer_cGM + 
+  #                BJ_gruppiert_cGM:GDPpcapita2009_cGM + (1 | Entity), 
+   #               family = "binomial", data = DataMEA)
+#summary(crosslevel)
 
 #Plus Cross-Level-Interaction
-crosslevel <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM
+crosslevel_GDP <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM
                       + Alter_gruppiert_cGM 
                       + Geschlecht_recoded 
                       + GDPpcapita2009_cGM
                       + BJ_gruppiert_cGM:GDPpcapita2009_cGM
                       + (1 + BJ_gruppiert_cGM + Geschlecht_recoded + Alter_gruppiert_cGM|| Entity),
                       data = DataMEA,
-                      family = "binomial",
+                      family = "binomial"
                       )
-summary(crosslevel)
+summary(crosslevel_GDP)
 
-#Plus Cross-Level-Interaction BJ3
-crosslevelBJ <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM
-                    + Alter_gruppiert_cGM 
-                    + Geschlecht_recoded 
-                    + GDPpcapita2009_cGM
-                    + BJ_gruppiert_cGM:GDPpcapita2009_cGM
-                    + (1 + BJ_gruppiert_cGM + Geschlecht_recoded + Alter_gruppiert_cGM|| Entity),
-                    data = DataMEA_filtered,
-                    family = "binomial",
+
+crosslevel_MGD <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM
+                      + Alter_gruppiert_cGM 
+                      + Geschlecht_recoded 
+                      + GDPpcapita2009_cGM
+                      +Mitgliedsdauer_cGM
+                      + BJ_gruppiert_cGM:Mitgliedsdauer_cGM
+                      + (1 + BJ_gruppiert_cGM + Geschlecht_recoded + Alter_gruppiert_cGM|| Entity),
+                      data = DataMEA,
+                      family = "binomial",
 )
-summary(crosslevelBJ)
+summary(crosslevel_MGD)
