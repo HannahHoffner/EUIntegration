@@ -40,8 +40,8 @@ EuBaDaten$Geschlecht_recoded <- NA
 EuBaDaten$Geschlecht_recoded [EuBaDaten$Geschlecht == 1] <- 1 #male
 EuBaDaten$Geschlecht_recoded [EuBaDaten$Geschlecht == 2] <- 0 #female
 
-EuBaDaten$Geschlecht_recoded <- ifelse(EuBaDaten$Geschlecht_recoded == 0, "Frau", "Mann")
-EuBaDaten$Geschlecht_recoded <- as.factor(EuBaDaten$Geschlecht_recoded)
+#EuBaDaten$Geschlecht_recoded <- ifelse(EuBaDaten$Geschlecht_recoded == 0, "Frau", "Mann")
+#EuBaDaten$Geschlecht_recoded <- as.factor(EuBaDaten$Geschlecht_recoded)
 
 #Einstellung zur EU recoden (dichotomisieren: good=1, bad&neither good nor bad=0, dk=löschen
 EuBaDaten$EinstellungDichotom <- NA
@@ -52,10 +52,10 @@ EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU %in% c(2, 3)] <- 0  #schl
 EuBaDaten <- EuBaDaten[!EuBaDaten$Einstellung_EU %in% c(4, 9), ]         # Löschen der Fälle mit den Antworten 4 (dont know) und 9(inap)
 
 # Umcodieren von 0 auf Ablehnung und 1 auf Zustimmung in EinstellungDichotom
-EuBaDaten$EinstellungDichotom <- ifelse(EuBaDaten$EinstellungDichotom == 0, "contraEU", "proEU")
+#EuBaDaten$EinstellungDichotom <- ifelse(EuBaDaten$EinstellungDichotom == 0, "contraEU", "proEU")
 
 # Jetzt wird die Spalte als Faktor umgewandelt
-EuBaDaten$EinstellungDichotom <- as.factor(EuBaDaten$EinstellungDichotom) #nicht nötig da oben kategorial koodiert
+#EuBaDaten$EinstellungDichotom <- as.factor(EuBaDaten$EinstellungDichotom) #nicht nötig da oben kategorial koodiert
 
 ## Einstellung in 3 Kategorien 
 #neue Variable
@@ -368,3 +368,42 @@ crosslevel_MGD <- glmer(EinstellungDichotom ~ BJ_gruppiert_cGM
                       family = "binomial",
 )
 summary(crosslevel_MGD)
+
+library(modelsummary)
+
+###Output: https://francish.net/mlmusingr/MLM_Appendix_A.pdf
+coefmap <- c('BJ_gruppiert_cGM' = 'Bildungsjahre gruppiert',
+             'Alter_gruppiert_cGM' = 'Alter gruppiert',
+             'Geschlecht_recoded'= 'Geschlecht',
+             'GDPpcapita2009_cGM' = 'GDP von 2009',
+             'Mitgliedsdauer_cGM' = 'Mitgliedsdauer',
+             '(Intercept)' = 'Constant',
+             'SD (BJ_gruppiert_cGM Entity)' = 'SD Bildungsjahre gruppiert, Land',
+             'SD (Geschlecht_recoded Entity)' = 'SD Geschlecht, Land',
+             'SD (Alter_gruppiert_cGM Entity)' = 'SD Alter gruppiert, Land',
+             'BJ_gruppiert_cGM:GDPpcapita2009_cGM' = 'Cross-Level-Interaktion Bildungsjahre, GDP',
+             'BJ_gruppiert_cGM:Mitgliedsdauer_cGM' = 'Cross-Level-Interaktion Bildungsjahre, Mitgliedsdauer',
+             'Cor (BJ_gruppiert_cGM~Alter_gruppiert_cGM Entity)'='Korrelation Bildungsjahre, Alter Land',			
+             'Cor (BJ_gruppiert_cGM~Geschlecht_recoded Entity)'='Korrelation Bildungsjahre, Geschlecht Land',			
+             'Cor (Alter_gruppiert_cGM~Geschlecht_recoded Entity)'='Korrelation Alter, Geschlecht Land'
+)
+library(gt)
+models <-list(RIM2, RSM2, random_slope_modell, crosslevel_GDP, crosslevel_MGD)
+tab <- modelsummary(models,
+                   coef_rename = coefmap,
+                   output = "gt",
+                   statistic = "({conf.low}, {conf.high})",
+                   exponentiate = TRUE, stars = TRUE,
+                   coef_omit = "Intercept",
+                   title = 'Logistische Mehrebenen-Regression Modellergebnisse mittels Odds Ratios (ORs)'
+)
+
+# customize table with `gt`
+
+tab %>%
+  
+  # column labels
+  tab_spanner(label = 'Random Intercept Individualmodell', columns = 2) %>%
+  tab_spanner(label = 'Random Slope Individualmodell', columns = 3) %>%
+  tab_spanner(label = 'Random Slope Individual- und Kontextmodell', columns = 4) %>%
+  tab_spanner(label = 'Cross-Level Interaktionen', columns = 5:6)
