@@ -47,8 +47,8 @@ EuBaDaten$Geschlecht_recoded [EuBaDaten$Geschlecht == 2] <- 0 #female
 EuBaDaten$EinstellungDichotom <- NA
 
 ## Umkodierung der Antwortkategorien und Zuordnung zu "EinstellungDichotom"
-EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU == 1] <- 1          #gut
-EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU %in% c(2, 3)] <- 0  #schlecht, weder noch
+EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU == 1] <- 0          #gut
+EuBaDaten$EinstellungDichotom[EuBaDaten$Einstellung_EU %in% c(2, 3)] <- 1  #schlecht, weder noch
 EuBaDaten <- EuBaDaten[!EuBaDaten$Einstellung_EU %in% c(4, 9), ]         # Löschen der Fälle mit den Antworten 4 (dont know) und 9(inap)
 
 # Umcodieren von 0 auf Ablehnung und 1 auf Zustimmung in EinstellungDichotom
@@ -62,8 +62,8 @@ EuBaDaten <- EuBaDaten[!EuBaDaten$Einstellung_EU %in% c(4, 9), ]         # Lösc
 EuBaDaten$Einstellung3 <- NA
 ## Umkodierung und Zuordnung 
 EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 3] <- 1 #wedernoch
-EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 1] <- 2 #good
-EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 2] <- 0 #bad
+EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 1] <- 0 #good
+EuBaDaten$Einstellung3[EuBaDaten$Einstellung_EU == 2] <- 2 #bad
 ## Überprüfung der neuen Variable
 table(EuBaDaten$Einstellung3)
 
